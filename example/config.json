@@ -1,0 +1,6 @@
+{
+  "redirectUri": "http://localhost:8080/callback",
+  "sharedSecret": "APP_SECRET",
+  "apiKey": "APP_KEY",
+  "shop": "SHOP_NAME"
+}

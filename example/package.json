@@ -1,0 +1,16 @@
+{
+  "name": "shopify-token-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [
+    "shopify-token",
+    "example"
+  ],
+  "author": "Luigi Pinca",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.3",
+    "express-session": "^1.12.1"
+  }
+}

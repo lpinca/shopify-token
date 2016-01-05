@@ -1,0 +1,32 @@
+{
+  "name": "shopify-token",
+  "version": "0.0.0",
+  "description": "Get an OAuth 2.0 access token for the Shopify API with ease",
+  "homepage": "https://github.com/lpinca/shopify-token",
+  "bugs": "https://github.com/lpinca/shopify-token/issues",
+  "repository": "lpinca/shopify-token",
+  "author": "Luigi Pinca",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test-travis": "istanbul cover _mocha --report lcovonly",
+    "coverage": "istanbul cover _mocha",
+    "test": "mocha"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "shopify",
+    "token",
+    "api",
+    "oauth"
+  ],
+  "devDependencies": {
+    "chai": "3.4.x",
+    "istanbul": "0.4.x",
+    "mocha": "2.3.x",
+    "nock": "4.0.x",
+    "pre-commit": "^1.1.2"
+  }
+}
