@@ -129,6 +129,10 @@ describe('shopify-token', function () {
     it('returns false if the query object is empty', function () {
       expect(shopifyToken.verifyHmac({})).to.equal(false);
     });
+
+    it('returns false if the properties values are not strings', function () {
+      expect(shopifyToken.verifyHmac({ foo: [1, 2] })).to.equal(false);
+    });
   });
 
   describe('#getAccessToken', function () {

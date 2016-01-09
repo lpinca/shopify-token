@@ -96,7 +96,11 @@ ShopifyToken.prototype.verifyHmac = function verifyHmac(query) {
   var pairs = Object.keys(query).filter(function filter(key) {
     return key !== 'signature' && key !== 'hmac';
   }).map(function map(key) {
-    return encodeKey(key) + '=' + encodeValue(query[key]);
+    var value = query[key];
+
+    return typeof value === 'string'
+      ? encodeKey(key) + '=' + encodeValue(value)
+      : '';
   }).sort();
 
   var digest = crypto.createHmac('sha256', this.sharedSecret)
