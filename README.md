@@ -17,17 +17,7 @@ npm install --save shopify-token
 
 ## API
 
-The module exports a constructor function which takes an options object:
-
-```js
-var ShopifyToken = require('shopify-token');
-
-var shopifyToken = new ShopifyToken({
-  sharedSecret: '8ceb18e8ca581aee7cad1ddd3991610b',
-  redirectUri: 'http://localhost:8080/callback',
-  apiKey: 'e74d25b9a6f2b15f2836c954ea8c1711'
-});
-```
+The module exports a constructor function which takes an options object.
 
 ### ShopifyToken(options)
 
@@ -49,6 +39,18 @@ are missing.
   specifies the list of scopes e.g. `'read_content,read_themes'`. Defaults to
   `'read_content'`.
 
+**Example**
+
+```js
+var ShopifyToken = require('shopify-token');
+
+var shopifyToken = new ShopifyToken({
+  sharedSecret: '8ceb18e8ca581aee7cad1ddd3991610b',
+  redirectUri: 'http://localhost:8080/callback',
+  apiKey: 'e74d25b9a6f2b15f2836c954ea8c1711'
+});
+```
+
 ### shopifyToken.generateAuthUrl(shop[, scopes]);
 
 Builds and returns the authorization URL where you should redirect the user.
@@ -59,6 +61,15 @@ Builds and returns the authorization URL where you should redirect the user.
 - `scopes` - An optional array of strings or comma-separated string to specify
   the list of scopes. This allows you to override the default scopes.
 
+**Example**
+
+```js
+var url = shopifyToken.generateAuthUrl('dolciumi');
+
+console.log(url);
+// => https://dolciumi.myshopify.com/admin/oauth/authorize?scope=read_content&state=7194ee27dd47ac9efb0ad04e93750e64&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&client_id=e74d25b9a6f2b15f2836c954ea8c1711
+```
+
 ### shopifyToken.verifyHmac(query);
 
 Every request or redirect from Shopify to the client server includes a hmac
@@ -68,6 +79,22 @@ validates the hmac parameter and returns `true` or `false` accordingly.
 **Arguments**
 
 - `query` - The parsed query string object.
+
+**Example**
+
+```js
+var ok = shopifyToken.verifyHmac({
+  hmac: 'd1c59b480761bdabf7ee7eb2c09a3d84e71b1d37991bc2872bea8a4c43f8b2b3',
+  signature: '184559898f5bbd1301606e7919c6e67f',
+  state: 'b77827e928ee8eee614b5808d3276c8a',
+  code: '4d732838ad8c22cd1d2dd96f8a403fb7',
+  shop: 'dolciumi.myshopify.com',
+  timestamp: '1452342558'
+});
+
+console.log(ok);
+// => true
+```
 
 ### shopifyToken.getAccessToken(hostname, code, fn)
 
@@ -82,6 +109,20 @@ Exchanges the authorization code for a permanent access token.
   passed by Shopify in the confirmation redirect.
 - `fn(err, token)` - An error-first callback function which is called when the
   token has been exchanged or an error occurs.
+
+**Example**
+
+```js
+var code = '4d732838ad8c22cd1d2dd96f8a403fb7'
+  , hostname = 'dolciumi.myshopify.com';
+
+shopifyToken.getAccessToken(hostname, code, function get(err, token) {
+  if (err) throw err;
+
+  console.log(token);
+  // => f85632530bf277ec9ac6f649fc327f17
+});
+```
 
 ## Usage
 
