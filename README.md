@@ -124,11 +124,6 @@ shopifyToken.getAccessToken(hostname, code, function get(err, token) {
 });
 ```
 
-## Usage
-
-The example folder contains an example of how you can use this module with
-Express.
-
 ## License
 
 [MIT](LICENSE)

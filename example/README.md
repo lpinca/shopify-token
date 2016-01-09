@@ -1,6 +1,6 @@
 # Example
 
-This example shows you how to use `shopify-token` with `express`.
+This example shows you how you can use `shopify-token` with `express`.
 
 To run it, edit the `config.json` file and add the client credentials, then
 install the dependencies:
