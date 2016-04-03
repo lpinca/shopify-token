@@ -23,10 +23,10 @@
     "oauth"
   ],
   "devDependencies": {
-    "chai": "3.4.x",
+    "chai": "3.5.x",
     "istanbul": "0.4.x",
-    "mocha": "2.3.x",
-    "nock": "5.2.x",
+    "mocha": "2.4.x",
+    "nock": "8.0.x",
     "pre-commit": "1.1.x"
   }
 }
