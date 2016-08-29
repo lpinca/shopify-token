@@ -179,11 +179,11 @@ describe('shopify-token', function () {
     it('returns an error if response statusCode is not 200', function (done) {
       scope
       .post(pathname)
-      .reply(400);
+      .reply(400, 'some error');
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Invalid status code (400) returned');
+        expect(err.message).to.equal('status: 400, some error');
         expect(res).to.equal(undefined);
         done();
       });
@@ -196,7 +196,7 @@ describe('shopify-token', function () {
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Failed to parse the response body');
+        expect(err.message).to.equal('Failed to parse the response body (<!DOCTYPE html><html><head></head><body></body></html>)');
         expect(res).to.equal(undefined);
         done();
       });

@@ -139,19 +139,19 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     var status = response.statusCode
       , body = '';
 
-    if (status !== 200) {
-      return fn(new Error('Invalid status code (' + status + ') returned'));
-    }
-
     response.setEncoding('utf8');
     response.on('data', function data(chunk) {
       body += chunk;
     });
     response.on('end', function end() {
+      if (status !== 200) {
+        return fn(new Error('status: ' + status + ', ' + body));
+      }
+
       try {
         body = JSON.parse(body);
       } catch (e) {
-        return fn(new Error('Failed to parse the response body'));
+        return fn(new Error('Failed to parse the response body (' + body + ')'));
       }
 
       fn(undefined, body.access_token);
