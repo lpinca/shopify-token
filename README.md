@@ -58,7 +58,24 @@ var shopifyToken = new ShopifyToken({
 });
 ```
 
-### `shopifyToken.generateAuthUrl(shop[, scopes]);`
+### `shopifyToken.generateNonce()`
+
+Generates a random nonce.
+
+#### Return value
+
+A string representing the nonce.
+
+#### Example
+
+```js
+var nonce = shopifyToken.generateNonce();
+
+console.log(nonce);
+// => 212a8b839860d1aefb258aaffcdbd63f
+```
+
+### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce]]);`
 
 Builds and returns the authorization URL where you should redirect the user.
 
@@ -67,6 +84,8 @@ Builds and returns the authorization URL where you should redirect the user.
 - `shop` - A string that specifies the name of the user's shop.
 - `scopes` - An optional array of strings or comma-separated string to specify
   the list of scopes. This allows you to override the default scopes.
+- `nonce` - An optional string representing the nonce. If not provided it will
+  be generated automatically.
 
 #### Return value
 

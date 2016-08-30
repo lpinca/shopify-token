@@ -51,17 +51,27 @@ describe('shopify-token', function () {
     expect(shopifyToken.scopes).to.equal('read_content,write_content');
   });
 
+  describe('#generateNonce', function () {
+    it('generates a random nonce', function () {
+      var nonce = shopifyToken.generateNonce();
+
+      expect(nonce).to.be.a('string').and.have.length(32);
+    });
+  });
+
   describe('#generateAuthUrl', function () {
     it('builds the authorization URL', function () {
-      var uri = shopifyToken.generateAuthUrl('qux');
+      var uri = shopifyToken.generateAuthUrl('qux')
+        , nonce = url.parse(uri, true).query.state;
 
+      expect(nonce).to.be.a('string').and.have.length(32);
       expect(uri).to.equal(url.format({
         pathname: '/admin/oauth/authorize',
         hostname: 'qux.myshopify.com',
         protocol: 'https:',
         query: {
           scope: 'read_content',
-          state: url.parse(uri, true).query.state,
+          state: nonce,
           redirect_uri: 'bar',
           client_id: 'baz'
         }
@@ -69,15 +79,17 @@ describe('shopify-token', function () {
     });
 
     it('allows to override the default scopes', function () {
-      var uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products');
+      var uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products')
+        , nonce = url.parse(uri, true).query.state;
 
+      expect(nonce).to.be.a('string').and.have.length(32);
       expect(uri).to.equal(url.format({
         pathname: '/admin/oauth/authorize',
         hostname: 'qux.myshopify.com',
         protocol: 'https:',
         query: {
           scope: 'read_themes,read_products',
-          state: url.parse(uri, true).query.state,
+          state: nonce,
           redirect_uri: 'bar',
           client_id: 'baz'
         }
@@ -89,14 +101,32 @@ describe('shopify-token', function () {
         'read_products',
         'read_themes'
       ]);
+      var nonce = url.parse(uri, true).query.state;
 
+      expect(nonce).to.be.a('string').and.have.length(32);
       expect(uri).to.equal(url.format({
         pathname: '/admin/oauth/authorize',
         hostname: 'qux.myshopify.com',
         protocol: 'https:',
         query: {
           scope: 'read_products,read_themes',
-          state: url.parse(uri, true).query.state,
+          state: nonce,
+          redirect_uri: 'bar',
+          client_id: 'baz'
+        }
+      }));
+    });
+
+    it('allows to use a custom nonce', function () {
+      var uri = shopifyToken.generateAuthUrl('qux', undefined, 'corge');
+
+      expect(uri).to.equal(url.format({
+        pathname: '/admin/oauth/authorize',
+        hostname: 'qux.myshopify.com',
+        protocol: 'https:',
+        query: {
+          scope: 'read_content',
+          state: 'corge',
           redirect_uri: 'bar',
           client_id: 'baz'
         }
