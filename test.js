@@ -183,7 +183,7 @@ describe('shopify-token', function () {
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('status: 400, some error');
+        expect(err.message).to.equal('Failed to get Shopify access token, status: 400, some error');
         expect(res).to.equal(undefined);
         done();
       });

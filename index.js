@@ -145,7 +145,7 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     });
     response.on('end', function end() {
       if (status !== 200) {
-        return fn(new Error('status: ' + status + ', ' + body));
+        return fn(new Error('Failed to get Shopify access token, status: ' + status + ', ' + body));
       }
 
       try {
