@@ -55,6 +55,7 @@ describe('shopify-token', function () {
   describe('#generateAuthUrl', function () {
     it('builds the authorization URL', function () {
       var uri = shopifyToken.generateAuthUrl('qux');
+      var nonce = url.parse(uri, true).query.state;
 
       expect(uri).to.equal(url.format({
         pathname: '/admin/oauth/authorize',
@@ -62,15 +63,16 @@ describe('shopify-token', function () {
         protocol: 'https:',
         query: {
           scope: 'read_content',
-          state: url.parse(uri, true).query.state,
+          state: nonce,
           redirect_uri: 'bar',
           client_id: 'baz'
         }
       }));
+      expect(nonce).to.be.a('string').and.have.length(32);
     });
 
-    it('allows to override the default scopes', function () {
-      var uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products');
+    it('allows to override the default scopes and nonce', function () {
+      var uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products', 'somenonce');
 
       expect(uri).to.equal(url.format({
         pathname: '/admin/oauth/authorize',
@@ -78,7 +80,7 @@ describe('shopify-token', function () {
         protocol: 'https:',
         query: {
           scope: 'read_themes,read_products',
-          state: url.parse(uri, true).query.state,
+          state: 'somenonce',
           redirect_uri: 'bar',
           client_id: 'baz'
         }
