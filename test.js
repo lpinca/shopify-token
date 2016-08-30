@@ -179,11 +179,13 @@ describe('shopify-token', function () {
     it('returns an error if response statusCode is not 200', function (done) {
       scope
       .post(pathname)
-      .reply(400, 'some error');
+      .reply(400, 'some error message from shopify');
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Failed to get Shopify access token, status: 400, some error');
+        expect(err).to.have.property('message', 'Failed to get Shopify access token');
+        expect(err).to.have.property('responseBody', 'some error message from shopify');
+        expect(err).to.have.property('statusCode', 400);
         expect(res).to.equal(undefined);
         done();
       });
@@ -196,7 +198,8 @@ describe('shopify-token', function () {
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Failed to parse the response body (<!DOCTYPE html><html><head></head><body></body></html>)');
+        expect(err).to.have.property('message', 'Failed to parse the response body');
+        expect(err).to.have.property('responseBody', '<!DOCTYPE html><html><head></head><body></body></html>');
         expect(res).to.equal(undefined);
         done();
       });

@@ -144,14 +144,20 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
       body += chunk;
     });
     response.on('end', function end() {
+      var error;
       if (status !== 200) {
-        return fn(new Error('Failed to get Shopify access token, status: ' + status + ', ' + body));
+        error = new Error('Failed to get Shopify access token');
+        error.responseBody = body;
+        error.statusCode = status;
+        return fn(error);
       }
 
       try {
         body = JSON.parse(body);
       } catch (e) {
-        return fn(new Error('Failed to parse the response body (' + body + ')'));
+        error = new Error('Failed to parse the response body');
+        error.responseBody = body;
+        return fn(error);
       }
 
       fn(undefined, body.access_token);
