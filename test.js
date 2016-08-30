@@ -200,6 +200,7 @@ describe('shopify-token', function () {
         expect(err).to.be.an.instanceof(Error);
         expect(err).to.have.property('message', 'Failed to parse the response body');
         expect(err).to.have.property('responseBody', '<!DOCTYPE html><html><head></head><body></body></html>');
+        expect(err).to.have.property('statusCode', 200);
         expect(res).to.equal(undefined);
         done();
       });
