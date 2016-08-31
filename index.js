@@ -13,7 +13,7 @@ var crypto = require('crypto')
  * @private
  */
 function encodeValue(input) {
-  return input.replace(/&/g, '%26').replace(/%/g, '%25');
+  return input.replace(/[%&]/g, encodeURIComponent);
 }
 
 /**
