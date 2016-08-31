@@ -59,20 +59,26 @@ function ShopifyToken(options) {
   this.apiKey = options.apiKey;
 }
 
+ShopifyToken.prototype.generateNonce = function() {
+  return crypto.randomBytes(16).toString('hex');
+};
+
 /**
  * Build the authorization URL.
  *
  * @param {String} shop The shop name
  * @param {Array|String} [scopes] The list of scopes
+ * @param {String} Random string (ideally persisted elsewhere) for comparison on callback
  * @return {String} The authorization URL
  * @public
  */
-ShopifyToken.prototype.generateAuthUrl = function generateAuthUrl(shop, scopes) {
-  scopes || (scopes = this.scopes);
+ShopifyToken.prototype.generateAuthUrl = function generateAuthUrl(shop, scopes, nonce) {
+  scopes = scopes || this.scopes;
+  nonce = nonce || this.generateNonce();
 
   var query = {
     scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
-    state: crypto.randomBytes(16).toString('hex'),
+    state: nonce,
     redirect_uri: this.redirectUri,
     client_id: this.apiKey
   };
