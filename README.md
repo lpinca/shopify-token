@@ -19,16 +19,15 @@ npm install --save shopify-token
 
 The module exports a constructor function which takes an options object.
 
-### ShopifyToken(options)
+### `ShopifyToken(options)`
 
-Returns a new ShopifyToken instance. Throws an erros if the required options
-are missing.
+Creates a new `ShopifyToken` instance.
 
-**Arguments**
+#### Arguments
 
 - `options` - A plain JavaScript objet e.g. `{ apiKey: 'YOUR_API_KEY' }`.
 
-**Options**
+#### Options
 
 - `apiKey` - Required - A string that specifies the API key of your app.
 - `sharedSecret` - Required - A string that specifies the shared secret of your
@@ -39,7 +38,15 @@ are missing.
   specifies the list of scopes e.g. `'read_content,read_themes'`. Defaults to
   `'read_content'`.
 
-**Example**
+#### Return value
+
+A `ShopifyToken` instance.
+
+#### Exceptions
+
+Throws a `Error` exception if the required options are missing.
+
+#### Example
 
 ```js
 var ShopifyToken = require('shopify-token');
@@ -51,17 +58,21 @@ var shopifyToken = new ShopifyToken({
 });
 ```
 
-### shopifyToken.generateAuthUrl(shop[, scopes]);
+### `shopifyToken.generateAuthUrl(shop[, scopes]);`
 
 Builds and returns the authorization URL where you should redirect the user.
 
-**Arguments**
+#### Arguments
 
 - `shop` - A string that specifies the name of the user's shop.
 - `scopes` - An optional array of strings or comma-separated string to specify
   the list of scopes. This allows you to override the default scopes.
 
-**Example**
+#### Return value
+
+A string representing the URL where the user should be redirected.
+
+#### Example
 
 ```js
 var url = shopifyToken.generateAuthUrl('dolciumi');
@@ -70,17 +81,21 @@ console.log(url);
 // => https://dolciumi.myshopify.com/admin/oauth/authorize?scope=read_content&state=7194ee27dd47ac9efb0ad04e93750e64&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&client_id=e74d25b9a6f2b15f2836c954ea8c1711
 ```
 
-### shopifyToken.verifyHmac(query);
+### `shopifyToken.verifyHmac(query)`;
 
 Every request or redirect from Shopify to the client server includes a hmac
 parameter that can be used to ensure that it came from Shopify. This method
-validates the hmac parameter and returns `true` or `false` accordingly.
+validates the hmac parameter.
 
-**Arguments**
+#### Arguments
 
 - `query` - The parsed query string object.
 
-**Example**
+#### Return value
+
+`true` if the hmac is valid, else `false`.
+
+#### Example
 
 ```js
 var ok = shopifyToken.verifyHmac({
@@ -96,11 +111,11 @@ console.log(ok);
 // => true
 ```
 
-### shopifyToken.getAccessToken(hostname, code, fn)
+### `shopifyToken.getAccessToken(hostname, code, fn)`
 
 Exchanges the authorization code for a permanent access token.
 
-**Arguments**
+#### Arguments
 
 - `hostname` - A string that specifies the hostname of the user's shop.
   e.g. `foo.myshopify.com`. You can get this from the `shop` parameter passed
@@ -108,9 +123,15 @@ Exchanges the authorization code for a permanent access token.
 - `code` - The authorization Code. You can get this from the `code` parameter
   passed by Shopify in the confirmation redirect.
 - `fn(err, token)` - An error-first callback function which is called when the
-  token has been exchanged or an error occurs.
+  token has been exchanged or an error occurs. When the exchange fails, you can
+  read the HTTP response status code and body from the `statusCode` and
+  `responseBody` properties which are added to the error object.
 
-**Example**
+#### Return value
+
+The `ShopifyToken` object.
+
+#### Example
 
 ```js
 var code = '4d732838ad8c22cd1d2dd96f8a403fb7'
