@@ -9,8 +9,8 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test-travis": "istanbul cover _mocha --report lcovonly",
-    "coverage": "istanbul cover _mocha",
+    "test-travis": "istanbul cover -x test.js _mocha --report lcovonly",
+    "coverage": "istanbul cover -x test.js _mocha",
     "test": "mocha"
   },
   "files": [
