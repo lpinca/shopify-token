@@ -174,4 +174,4 @@ shopifyToken.getAccessToken(hostname, code, function get(err, token) {
 [travis-shopify-token]: https://travis-ci.org/lpinca/shopify-token
 [coverage-shopify-token-badge]: https://img.shields.io/coveralls/lpinca/shopify-token/master.svg
 [coverage-shopify-token]: https://coveralls.io/r/lpinca/shopify-token?branch=master
-[shopify-oauth-doc]: https://docs.shopify.com/api/authentication/oauth
+[shopify-oauth-doc]: https://help.shopify.com/api/guides/authentication/oauth
