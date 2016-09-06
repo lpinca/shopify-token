@@ -169,17 +169,21 @@ describe('shopify-token', function () {
       , hostname = 'qux.myshopify.com'
       , scope = nock('https://' + hostname);
 
+    afterEach(function () {
+      expect(scope.isDone()).to.be.true;
+    });
+
     it('exchanges the auth code for the access token', function (done) {
       var token = 'f85632530bf277ec9ac6f649fc327f17'
         , code = '4d732838ad8c22cd1d2dd96f8a403fb7';
 
       scope
-      .post(pathname, {
-        client_secret: 'foo',
-        client_id: 'baz',
-        code: code
-      })
-      .reply(200, { access_token: token });
+        .post(pathname, {
+          client_secret: 'foo',
+          client_id: 'baz',
+          code: code
+        })
+        .reply(200, { access_token: token });
 
       shopifyToken.getAccessToken(hostname, code, function (err, res) {
         if (err) return done(err);
@@ -193,8 +197,8 @@ describe('shopify-token', function () {
       var message = 'Something wrong happened';
 
       scope
-      .post(pathname)
-      .replyWithError(message);
+        .post(pathname)
+        .replyWithError(message);
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
@@ -208,8 +212,8 @@ describe('shopify-token', function () {
       var body = 'some error message from shopify';
 
       scope
-      .post(pathname)
-      .reply(400, body);
+        .post(pathname)
+        .reply(400, body);
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
@@ -225,8 +229,8 @@ describe('shopify-token', function () {
       var body = '<!DOCTYPE html><html><head></head><body></body></html>';
 
       scope
-      .post(pathname)
-      .reply(200, body);
+        .post(pathname)
+        .reply(200, body);
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
