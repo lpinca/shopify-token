@@ -3,8 +3,7 @@
 var session = require('express-session')
   , ShopifyToken = require('../')
   , express = require('express')
-  , config = require('./config')
-  , url = require('url');
+  , config = require('./config');
 
 var shopifyToken = new ShopifyToken(config);
 
@@ -20,16 +19,21 @@ app.get('/', function (req, res) {
   if (req.session.token) return res.send('Token ready to be used');
 
   //
+  // Generate a random nonce.
+  //
+  var nonce = shopifyToken.generateNonce();
+
+  //
   // Generate the authorization URL. For the sake of simplicity the shop name
   // is fixed here but it can, of course, be passed along with the request and
   // be different for each request.
   //
-  var uri = shopifyToken.generateAuthUrl(config.shop);
+  var uri = shopifyToken.generateAuthUrl(config.shop, undefined, nonce);
 
   //
-  // Save the state parameter in the session to verify it later.
+  // Save the nonce in the session to verify it later.
   //
-  req.session.state = url.parse(uri, true).query.state;
+  req.session.state = nonce;
   res.redirect(uri);
 });
 
