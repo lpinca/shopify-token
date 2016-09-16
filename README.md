@@ -75,7 +75,7 @@ console.log(nonce);
 // => 212a8b839860d1aefb258aaffcdbd63f
 ```
 
-### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce]]);`
+### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce]])`
 
 Builds and returns the authorization URL where you should redirect the user.
 
@@ -100,7 +100,7 @@ console.log(url);
 // => https://dolciumi.myshopify.com/admin/oauth/authorize?scope=read_content&state=7194ee27dd47ac9efb0ad04e93750e64&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&client_id=e74d25b9a6f2b15f2836c954ea8c1711
 ```
 
-### `shopifyToken.verifyHmac(query)`;
+### `shopifyToken.verifyHmac(query)`
 
 Every request or redirect from Shopify to the client server includes a hmac
 parameter that can be used to ensure that it came from Shopify. This method
