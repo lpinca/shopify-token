@@ -219,7 +219,7 @@ describe('shopify-token', function () {
       });
     });
 
-    it('returns an error when timeout expires (socket)', function (done) {
+    it('returns an error when timeout expires (headers)', function (done) {
       var shopifyToken = ShopifyToken({
         sharedSecret: 'foo',
         redirectUri: 'bar',
@@ -229,12 +229,33 @@ describe('shopify-token', function () {
 
       scope
         .post(pathname)
-        .socketDelay(200)
+        .delay({ head: 200 })
         .reply(200, {});
 
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Socket timed out');
+        expect(err.message).to.equal('Request timed out');
+        expect(res).to.equal(undefined);
+        done();
+      });
+    });
+
+    it('returns an error when timeout expires (body)', function (done) {
+      var shopifyToken = ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        timeout: 100
+      });
+
+      scope
+        .post(pathname)
+        .delay({ body: 200 })
+        .reply(200, {});
+
+      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('Request timed out');
         expect(res).to.equal(undefined);
         done();
       });
@@ -249,16 +270,14 @@ describe('shopify-token', function () {
       });
 
       //
-      // `scope.delay()` or `scope.delayConnection()` only delay the `response`
-      // event. The connection is still established so they are useless for
-      // this test. To make things worse, the socket timeout handler is only
-      // invoked if `scope.socketDelay()` is used.
-      // To work around these issues a non-routable IP address is used here
-      // instead of `nock`.
+      // `scope.delay()` can only delay the `response` event. The connection is
+      // still established so it is useless for this test. To work around this
+      // issues a non-routable IP address is used here instead of `nock`. See
+      // https://tools.ietf.org/html/rfc5737#section-3
       //
-      shopifyToken.getAccessToken('127.0.0.128', '123456', function (err, res) {
+      shopifyToken.getAccessToken('192.0.2.1', '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Connection timed out');
+        expect(err.message).to.equal('Request timed out');
         expect(res).to.equal(undefined);
         done();
       });

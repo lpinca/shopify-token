@@ -29,25 +29,6 @@ function encodeKey(input) {
 }
 
 /**
- * Prevent a callback from being invoked more than once.
- *
- * @param {Function} fn The callback to invoke only once
- * @return {Function} A function that invokes `fn` only once
- * @private
- */
-function once(fn) {
-  var called = false;
-
-  return function onetime() {
-    if (called) return;
-
-    called = true;
-    fn.apply(this, arguments);
-    fn = null;
-  };
-}
-
-/**
  * Create a ShopifyToken instance.
  *
  * @param {Object} options Configuration options
@@ -152,8 +133,6 @@ ShopifyToken.prototype.verifyHmac = function verifyHmac(query) {
  * @public
  */
 ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) {
-  fn = once(fn);
-
   var data = JSON.stringify({
     client_secret: this.sharedSecret,
     client_id: this.apiKey,
@@ -171,21 +150,11 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     method: 'POST'
   });
 
-  var timeout = this.timeout;
-  var timer = setTimeout(function connectionTimeout() {
+  var timer = setTimeout(function timeout() {
     request.abort();
-    fn(new Error('Connection timed out'));
-  }, timeout);
-
-  request.on('socket', function assign(socket) {
-    socket.on('connect', function connect() {
-      clearTimeout(timer);
-      socket.setTimeout(timeout, function socketTimeout() {
-        request.abort();
-        fn(new Error('Socket timed out'));
-      });
-    });
-  });
+    timer = null;
+    fn(new Error('Request timed out'));
+  }, this.timeout);
 
   request.on('response', function reply(response) {
     var status = response.statusCode
@@ -197,6 +166,10 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     });
     response.on('end', function end() {
       var error;
+
+      if (!timer) return;
+
+      clearTimeout(timer);
 
       if (status !== 200) {
         error = new Error('Failed to get Shopify access token');
@@ -219,6 +192,8 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
   });
 
   request.on('error', function error(err) {
+    if (!timer) return;
+
     clearTimeout(timer);
     fn(err);
   });
