@@ -25,7 +25,26 @@ function encodeValue(input) {
  * @private
  */
 function encodeKey(input) {
-  return encodeValue(input).replace(/=/g, '%3D');
+  return input.replace(/[%&=]/g, encodeURIComponent);
+}
+
+/**
+ * Prevent a callback from being invoked more than once.
+ *
+ * @param {Function} fn The callback to invoke only once
+ * @return {Function} A function that invokes `fn` only once
+ * @private
+ */
+function once(fn) {
+  var called = false;
+
+  return function onetime() {
+    if (called) return;
+
+    called = true;
+    fn.apply(this, arguments);
+    fn = null;
+  };
 }
 
 /**
@@ -36,6 +55,7 @@ function encodeKey(input) {
  * @param {String} options.sharedSecret The Shared Secret for the app
  * @param {Array|String} [options.scopes] The list of scopes
  * @param {String} options.apiKey The API Key for the app
+ * @param {Number} [options.timeout] The request timeout
  * @constructor
  * @public
  */
@@ -54,6 +74,7 @@ function ShopifyToken(options) {
   }
 
   this.scopes = 'scopes' in options ? options.scopes : 'read_content';
+  this.timeout = 'timeout' in options ? options.timeout : 60000;
   this.sharedSecret = options.sharedSecret;
   this.redirectUri = options.redirectUri;
   this.apiKey = options.apiKey;
@@ -131,6 +152,8 @@ ShopifyToken.prototype.verifyHmac = function verifyHmac(query) {
  * @public
  */
 ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) {
+  fn = once(fn);
+
   var data = JSON.stringify({
     client_secret: this.sharedSecret,
     client_id: this.apiKey,
@@ -146,7 +169,25 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     path: '/admin/oauth/access_token',
     hostname: shop,
     method: 'POST'
-  }, function reply(response) {
+  });
+
+  var timeout = this.timeout;
+  var timer = setTimeout(function connectionTimeout() {
+    request.abort();
+    fn(new Error('Connection timed out'));
+  }, timeout);
+
+  request.on('socket', function assign(socket) {
+    socket.on('connect', function connect() {
+      clearTimeout(timer);
+      socket.setTimeout(timeout, function socketTimeout() {
+        request.abort();
+        fn(new Error('Socket timed out'));
+      });
+    });
+  });
+
+  request.on('response', function reply(response) {
     var status = response.statusCode
       , body = '';
 
@@ -177,7 +218,11 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     });
   });
 
-  request.on('error', fn);
+  request.on('error', function error(err) {
+    clearTimeout(timer);
+    fn(err);
+  });
+
   request.end(data);
 
   return this;

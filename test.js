@@ -12,7 +12,7 @@ describe('shopify-token', function () {
     apiKey: 'baz'
   });
 
-  it('exports the contructor', function () {
+  it('exports the constructor', function () {
     expect(ShopifyToken).to.be.a('function');
   });
 
@@ -49,6 +49,17 @@ describe('shopify-token', function () {
     });
 
     expect(shopifyToken.scopes).to.equal('read_content,write_content');
+  });
+
+  it('allows to customize the request timeout', function () {
+    var shopifyToken = ShopifyToken({
+      sharedSecret: 'foo',
+      redirectUri: 'bar',
+      apiKey: 'baz',
+      timeout: 300
+    });
+
+    expect(shopifyToken.timeout).to.equal(300);
   });
 
   describe('#generateNonce', function () {
@@ -203,6 +214,51 @@ describe('shopify-token', function () {
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal(message);
+        expect(res).to.equal(undefined);
+        done();
+      });
+    });
+
+    it('returns an error when timeout expires (socket)', function (done) {
+      var shopifyToken = ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        timeout: 100
+      });
+
+      scope
+        .post(pathname)
+        .socketDelay(200)
+        .reply(200, {});
+
+      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('Socket timed out');
+        expect(res).to.equal(undefined);
+        done();
+      });
+    });
+
+    it('returns an error when timeout expires (connection)', function (done) {
+      var shopifyToken = ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        timeout: 100
+      });
+
+      //
+      // `scope.delay()` or `scope.delayConnection()` only delay the `response`
+      // event. The connection is still established so they are useless for
+      // this test. To make things worse, the socket timeout handler is only
+      // invoked if `scope.socketDelay()` is used.
+      // To work around these issues a non-routable IP address is used here
+      // instead of `nock`.
+      //
+      shopifyToken.getAccessToken('127.0.0.128', '123456', function (err, res) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('Connection timed out');
         expect(res).to.equal(undefined);
         done();
       });
