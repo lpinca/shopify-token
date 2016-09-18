@@ -25,7 +25,7 @@ function encodeValue(input) {
  * @private
  */
 function encodeKey(input) {
-  return encodeValue(input).replace(/=/g, '%3D');
+  return input.replace(/[%&=]/g, encodeURIComponent);
 }
 
 /**
@@ -36,6 +36,7 @@ function encodeKey(input) {
  * @param {String} options.sharedSecret The Shared Secret for the app
  * @param {Array|String} [options.scopes] The list of scopes
  * @param {String} options.apiKey The API Key for the app
+ * @param {Number} [options.timeout] The request timeout
  * @constructor
  * @public
  */
@@ -54,6 +55,7 @@ function ShopifyToken(options) {
   }
 
   this.scopes = 'scopes' in options ? options.scopes : 'read_content';
+  this.timeout = 'timeout' in options ? options.timeout : 60000;
   this.sharedSecret = options.sharedSecret;
   this.redirectUri = options.redirectUri;
   this.apiKey = options.apiKey;
@@ -146,7 +148,15 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     path: '/admin/oauth/access_token',
     hostname: shop,
     method: 'POST'
-  }, function reply(response) {
+  });
+
+  var timer = setTimeout(function timeout() {
+    request.abort();
+    timer = null;
+    fn(new Error('Request timed out'));
+  }, this.timeout);
+
+  request.on('response', function reply(response) {
     var status = response.statusCode
       , body = '';
 
@@ -156,6 +166,10 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     });
     response.on('end', function end() {
       var error;
+
+      if (!timer) return;
+
+      clearTimeout(timer);
 
       if (status !== 200) {
         error = new Error('Failed to get Shopify access token');
@@ -177,7 +191,13 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) 
     });
   });
 
-  request.on('error', fn);
+  request.on('error', function error(err) {
+    if (!timer) return;
+
+    clearTimeout(timer);
+    fn(err);
+  });
+
   request.end(data);
 
   return this;

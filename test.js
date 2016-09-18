@@ -12,7 +12,7 @@ describe('shopify-token', function () {
     apiKey: 'baz'
   });
 
-  it('exports the contructor', function () {
+  it('exports the constructor', function () {
     expect(ShopifyToken).to.be.a('function');
   });
 
@@ -49,6 +49,17 @@ describe('shopify-token', function () {
     });
 
     expect(shopifyToken.scopes).to.equal('read_content,write_content');
+  });
+
+  it('allows to customize the request timeout', function () {
+    var shopifyToken = ShopifyToken({
+      sharedSecret: 'foo',
+      redirectUri: 'bar',
+      apiKey: 'baz',
+      timeout: 300
+    });
+
+    expect(shopifyToken.timeout).to.equal(300);
   });
 
   describe('#generateNonce', function () {
@@ -203,6 +214,70 @@ describe('shopify-token', function () {
       shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal(message);
+        expect(res).to.equal(undefined);
+        done();
+      });
+    });
+
+    it('returns an error when timeout expires (headers)', function (done) {
+      var shopifyToken = ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        timeout: 100
+      });
+
+      scope
+        .post(pathname)
+        .delay({ head: 200 })
+        .reply(200, {});
+
+      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('Request timed out');
+        expect(res).to.equal(undefined);
+        done();
+      });
+    });
+
+    it('returns an error when timeout expires (body)', function (done) {
+      var shopifyToken = ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        timeout: 100
+      });
+
+      scope
+        .post(pathname)
+        .delay({ body: 200 })
+        .reply(200, {});
+
+      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('Request timed out');
+        expect(res).to.equal(undefined);
+        done();
+      });
+    });
+
+    it('returns an error when timeout expires (connection)', function (done) {
+      var shopifyToken = ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        timeout: 100
+      });
+
+      //
+      // `scope.delay()` can only delay the `response` event. The connection is
+      // still established so it is useless for this test. To work around this
+      // issues a non-routable IP address is used here instead of `nock`. See
+      // https://tools.ietf.org/html/rfc5737#section-3
+      //
+      shopifyToken.getAccessToken('192.0.2.1', '123456', function (err, res) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('Request timed out');
         expect(res).to.equal(undefined);
         done();
       });
