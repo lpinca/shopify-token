@@ -1,6 +1,6 @@
 {
   "name": "shopify-token",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Get an OAuth 2.0 access token for the Shopify API with ease",
   "homepage": "https://github.com/lpinca/shopify-token",
   "bugs": "https://github.com/lpinca/shopify-token/issues",
