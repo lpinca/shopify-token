@@ -1,6 +1,6 @@
 'use strict';
 
-var crypto = require('crypto')
+const crypto = require('crypto')
   , https = require('https')
   , url = require('url');
 
@@ -83,7 +83,7 @@ ShopifyToken.prototype.generateNonce = function() {
 ShopifyToken.prototype.generateAuthUrl = function generateAuthUrl(shop, scopes, nonce) {
   scopes || (scopes = this.scopes);
 
-  var query = {
+  const query = {
     scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
     state: nonce || this.generateNonce(),
     redirect_uri: this.redirectUri,
@@ -106,17 +106,17 @@ ShopifyToken.prototype.generateAuthUrl = function generateAuthUrl(shop, scopes, 
  * @public
  */
 ShopifyToken.prototype.verifyHmac = function verifyHmac(query) {
-  var pairs = Object.keys(query).filter(function filter(key) {
+  const pairs = Object.keys(query).filter(function filter(key) {
     return key !== 'signature' && key !== 'hmac';
   }).map(function map(key) {
-    var value = query[key];
+    const value = query[key];
 
     return typeof value === 'string'
       ? encodeKey(key) + '=' + encodeValue(value)
       : '';
   }).sort();
 
-  var digest = crypto.createHmac('sha256', this.sharedSecret)
+  const digest = crypto.createHmac('sha256', this.sharedSecret)
     .update(pairs.join('&'))
     .digest('hex');
 
@@ -128,18 +128,18 @@ ShopifyToken.prototype.verifyHmac = function verifyHmac(query) {
  *
  * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
  * @param {String} code The authorization code
- * @return {Promise} token
+ * @return {Promise} Promise which is fulfilled with the token.
  * @public
  */
 ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code) {
   return new Promise((resolve, reject) => {
-    var data = JSON.stringify({
+    const data = JSON.stringify({
       client_secret: this.sharedSecret,
       client_id: this.apiKey,
       code: code
     });
 
-    var request = https.request({
+    const request = https.request({
       headers: {
         'Content-Length': Buffer.byteLength(data),
         'Content-Type': 'application/json',
@@ -150,14 +150,14 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code) {
       method: 'POST'
     });
 
-    var timer = setTimeout(function timeout() {
+    let timer = setTimeout(function timeout() {
       request.abort();
       timer = null;
       reject(new Error('Request timed out'))
     }, this.timeout);
 
     request.on('response', function reply(response) {
-      var status = response.statusCode
+      let status = response.statusCode
         , body = '';
 
       response.setEncoding('utf8');
@@ -165,7 +165,7 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code) {
         body += chunk;
       });
       response.on('end', function end() {
-        var error;
+        let error;
 
         if (!timer) return;
 
