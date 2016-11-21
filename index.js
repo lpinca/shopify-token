@@ -175,7 +175,7 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code) {
           error = new Error('Failed to get Shopify access token');
           error.responseBody = body;
           error.statusCode = status;
-          reject(error);
+          return reject(error);
         }
 
         try {
@@ -184,7 +184,7 @@ ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code) {
           error = new Error('Failed to parse the response body');
           error.responseBody = body;
           error.statusCode = status;
-          reject(error);
+          return reject(error);
         }
 
         resolve(body.access_token);
