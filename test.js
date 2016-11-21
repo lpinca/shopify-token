@@ -196,12 +196,13 @@ describe('shopify-token', function () {
         })
         .reply(200, { access_token: token });
 
-      shopifyToken.getAccessToken(hostname, code, function (err, res) {
-        if (err) return done(err);
-
+      shopifyToken.getAccessToken(hostname, code).then(function (res) {
+        console.log('123')
         expect(res).to.equal(token);
         done();
-      });
+      }).catch(function (err) {
+        console.log(err)
+      })
     });
 
     it('returns an error if the request fails', function (done) {
@@ -211,12 +212,12 @@ describe('shopify-token', function () {
         .post(pathname)
         .replyWithError(message);
 
-      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal(message);
-        expect(res).to.equal(undefined);
         done();
-      });
+      })
+
     });
 
     it('returns an error when timeout expires (headers)', function (done) {
@@ -232,12 +233,11 @@ describe('shopify-token', function () {
         .delay({ head: 200 })
         .reply(200, {});
 
-      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal('Request timed out');
-        expect(res).to.equal(undefined);
         done();
-      });
+      })
     });
 
     it('returns an error when timeout expires (body)', function (done) {
@@ -253,12 +253,12 @@ describe('shopify-token', function () {
         .delay({ body: 200 })
         .reply(200, {});
 
-      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal('Request timed out');
-        expect(res).to.equal(undefined);
         done();
       });
+
     });
 
     it('returns an error when timeout expires (connection)', function (done) {
@@ -275,10 +275,9 @@ describe('shopify-token', function () {
       // issues a non-routable IP address is used here instead of `nock`. See
       // https://tools.ietf.org/html/rfc5737#section-3
       //
-      shopifyToken.getAccessToken('192.0.2.1', '123456', function (err, res) {
+      shopifyToken.getAccessToken('192.0.2.1', '123456').catch(function (err) {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal('Request timed out');
-        expect(res).to.equal(undefined);
         done();
       });
     });
@@ -290,12 +289,11 @@ describe('shopify-token', function () {
         .post(pathname)
         .reply(400, body);
 
-      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
         expect(err).to.be.an.instanceof(Error);
         expect(err).to.have.property('message', 'Failed to get Shopify access token');
         expect(err).to.have.property('responseBody', body);
         expect(err).to.have.property('statusCode', 400);
-        expect(res).to.equal(undefined);
         done();
       });
     });
@@ -307,12 +305,11 @@ describe('shopify-token', function () {
         .post(pathname)
         .reply(200, body);
 
-      shopifyToken.getAccessToken(hostname, '123456', function (err, res) {
+      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
         expect(err).to.be.an.instanceof(Error);
         expect(err).to.have.property('message', 'Failed to parse the response body');
         expect(err).to.have.property('responseBody', body);
         expect(err).to.have.property('statusCode', 200);
-        expect(res).to.equal(undefined);
         done();
       });
     });

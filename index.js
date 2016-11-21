@@ -128,79 +128,78 @@ ShopifyToken.prototype.verifyHmac = function verifyHmac(query) {
  *
  * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
  * @param {String} code The authorization code
- * @param {Function} fn Callback
- * @return {ShopifyToken} this
+ * @return {Promise} Promise which is fulfilled with the token
  * @public
  */
-ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code, fn) {
-  var data = JSON.stringify({
-    client_secret: this.sharedSecret,
-    client_id: this.apiKey,
-    code: code
-  });
-
-  var request = https.request({
-    headers: {
-      'Content-Length': Buffer.byteLength(data),
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    path: '/admin/oauth/access_token',
-    hostname: shop,
-    method: 'POST'
-  });
-
-  var timer = setTimeout(function timeout() {
-    request.abort();
-    timer = null;
-    fn(new Error('Request timed out'));
-  }, this.timeout);
-
-  request.on('response', function reply(response) {
-    var status = response.statusCode
-      , body = '';
-
-    response.setEncoding('utf8');
-    response.on('data', function data(chunk) {
-      body += chunk;
+ShopifyToken.prototype.getAccessToken = function getAccessToken(shop, code) {
+  return new Promise((resolve, reject) => {
+    var data = JSON.stringify({
+      client_secret: this.sharedSecret,
+      client_id: this.apiKey,
+      code: code
     });
-    response.on('end', function end() {
-      var error;
 
+    var request = https.request({
+      headers: {
+        'Content-Length': Buffer.byteLength(data),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      path: '/admin/oauth/access_token',
+      hostname: shop,
+      method: 'POST'
+    });
+
+    var timer = setTimeout(function timeout() {
+      request.abort();
+      timer = null;
+      reject(new Error('Request timed out'));
+    }, this.timeout);
+
+    request.on('response', function reply(response) {
+      var status = response.statusCode
+        , body = '';
+
+      response.setEncoding('utf8');
+      response.on('data', function data(chunk) {
+        body += chunk;
+      });
+      response.on('end', function end() {
+        var error;
+
+        if (!timer) return;
+
+        clearTimeout(timer);
+
+        if (status !== 200) {
+          error = new Error('Failed to get Shopify access token');
+          error.responseBody = body;
+          error.statusCode = status;
+          return reject(error);
+        }
+
+        try {
+          body = JSON.parse(body);
+        } catch (e) {
+          error = new Error('Failed to parse the response body');
+          error.responseBody = body;
+          error.statusCode = status;
+          return reject(error);
+        }
+
+        resolve(body.access_token);
+      });
+    });
+
+    request.on('error', function error(err) {
       if (!timer) return;
 
       clearTimeout(timer);
-
-      if (status !== 200) {
-        error = new Error('Failed to get Shopify access token');
-        error.responseBody = body;
-        error.statusCode = status;
-        return fn(error);
-      }
-
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        error = new Error('Failed to parse the response body');
-        error.responseBody = body;
-        error.statusCode = status;
-        return fn(error);
-      }
-
-      fn(undefined, body.access_token);
+      reject(err);
     });
+
+    request.end(data);
   });
-
-  request.on('error', function error(err) {
-    if (!timer) return;
-
-    clearTimeout(timer);
-    fn(err);
-  });
-
-  request.end(data);
-
-  return this;
 };
 
 module.exports = ShopifyToken;
