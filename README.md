@@ -133,7 +133,7 @@ console.log(ok);
 // => true
 ```
 
-### `shopifyToken.getAccessToken(hostname, code, fn)`
+### `shopifyToken.getAccessToken(hostname, code)`
 
 Exchanges the authorization code for a permanent access token.
 
@@ -144,14 +144,13 @@ Exchanges the authorization code for a permanent access token.
   by Shopify in the confirmation redirect.
 - `code` - The authorization Code. You can get this from the `code` parameter
   passed by Shopify in the confirmation redirect.
-- `fn(err, token)` - An error-first callback function which is called when the
-  token has been exchanged or an error occurs. When the exchange fails, you can
-  read the HTTPS response status code and body from the `statusCode` and
-  `responseBody` properties which are added to the error object.
 
 #### Return value
 
-The `ShopifyToken` object.
+A `Promise` which gets resolved with the `token`. When the exchange fails, you can
+read the HTTPS response status code and body from the `statusCode` and
+`responseBody` properties which are added to the error object.
+
 
 #### Example
 
@@ -159,12 +158,12 @@ The `ShopifyToken` object.
 var code = '4d732838ad8c22cd1d2dd96f8a403fb7'
   , hostname = 'dolciumi.myshopify.com';
 
-shopifyToken.getAccessToken(hostname, code, function get(err, token) {
-  if (err) throw err;
-
+shopifyToken.getAccessToken(hostname, code).then(token => {
   console.log(token);
   // => f85632530bf277ec9ac6f649fc327f17
-});
+}).catch(err => {
+  throw err
+})
 ```
 
 ## License
