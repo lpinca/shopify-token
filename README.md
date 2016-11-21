@@ -147,9 +147,7 @@ Exchanges the authorization code for a permanent access token.
 
 #### Return value
 
-A `Promise` which gets resolved with the `token`. When the exchange fails, you can
-read the HTTPS response status code and body from the `statusCode` and
-`responseBody` properties which are added to the error object.
+A `Promise` which gets resolved with the `token`. When the exchange fails, you can read the HTTPS response status code and body from the `statusCode` and `responseBody` properties which are added to the error object.
 
 
 #### Example
@@ -162,7 +160,7 @@ shopifyToken.getAccessToken(hostname, code).then(token => {
   console.log(token);
   // => f85632530bf277ec9ac6f649fc327f17
 }).catch(err => {
-  throw err
+  console.err(err)
 })
 ```
 
