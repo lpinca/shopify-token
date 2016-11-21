@@ -52,9 +52,9 @@ Throws a `Error` exception if the required options are missing.
 #### Example
 
 ```js
-var ShopifyToken = require('shopify-token');
+const ShopifyToken = require('shopify-token');
 
-var shopifyToken = new ShopifyToken({
+const shopifyToken = new ShopifyToken({
   sharedSecret: '8ceb18e8ca581aee7cad1ddd3991610b',
   redirectUri: 'http://localhost:8080/callback',
   apiKey: 'e74d25b9a6f2b15f2836c954ea8c1711'
@@ -72,7 +72,7 @@ A string representing the nonce.
 #### Example
 
 ```js
-var nonce = shopifyToken.generateNonce();
+const nonce = shopifyToken.generateNonce();
 
 console.log(nonce);
 // => 212a8b839860d1aefb258aaffcdbd63f
@@ -97,7 +97,7 @@ A string representing the URL where the user should be redirected.
 #### Example
 
 ```js
-var url = shopifyToken.generateAuthUrl('dolciumi');
+const url = shopifyToken.generateAuthUrl('dolciumi');
 
 console.log(url);
 // => https://dolciumi.myshopify.com/admin/oauth/authorize?scope=read_content&state=7194ee27dd47ac9efb0ad04e93750e64&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&client_id=e74d25b9a6f2b15f2836c954ea8c1711
@@ -120,7 +120,7 @@ validates the hmac parameter.
 #### Example
 
 ```js
-var ok = shopifyToken.verifyHmac({
+const ok = shopifyToken.verifyHmac({
   hmac: 'd1c59b480761bdabf7ee7eb2c09a3d84e71b1d37991bc2872bea8a4c43f8b2b3',
   signature: '184559898f5bbd1301606e7919c6e67f',
   state: 'b77827e928ee8eee614b5808d3276c8a',
@@ -133,7 +133,7 @@ console.log(ok);
 // => true
 ```
 
-### `shopifyToken.getAccessToken(hostname, code, fn)`
+### `shopifyToken.getAccessToken(hostname, code)`
 
 Exchanges the authorization code for a permanent access token.
 
@@ -144,27 +144,24 @@ Exchanges the authorization code for a permanent access token.
   by Shopify in the confirmation redirect.
 - `code` - The authorization Code. You can get this from the `code` parameter
   passed by Shopify in the confirmation redirect.
-- `fn(err, token)` - An error-first callback function which is called when the
-  token has been exchanged or an error occurs. When the exchange fails, you can
-  read the HTTPS response status code and body from the `statusCode` and
-  `responseBody` properties which are added to the error object.
 
 #### Return value
 
-The `ShopifyToken` object.
+A `Promise` which gets resolved with the `token`. When the exchange fails, you can read the HTTPS response status code and body from the `statusCode` and `responseBody` properties which are added to the error object.
+
 
 #### Example
 
 ```js
-var code = '4d732838ad8c22cd1d2dd96f8a403fb7'
+const code = '4d732838ad8c22cd1d2dd96f8a403fb7'
   , hostname = 'dolciumi.myshopify.com';
 
-shopifyToken.getAccessToken(hostname, code, function get(err, token) {
-  if (err) throw err;
-
+shopifyToken.getAccessToken(hostname, code).then(token => {
   console.log(token);
   // => f85632530bf277ec9ac6f649fc327f17
-});
+}).catch(err => {
+  console.err(err)
+})
 ```
 
 ## License
