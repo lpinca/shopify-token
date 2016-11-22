@@ -1,39 +1,30 @@
 describe('shopify-token', function () {
   'use strict';
 
-  var expect = require('chai').expect
-    , ShopifyToken = require('./')
-    , nock = require('nock')
-    , url = require('url');
+  const expect = require('chai').expect;
+  const nock = require('nock');
+  const url = require('url');
 
-  var shopifyToken = new ShopifyToken({
+  const ShopifyToken = require('.');
+
+  const shopifyToken = new ShopifyToken({
     sharedSecret: 'foo',
     redirectUri: 'bar',
     apiKey: 'baz'
   });
 
-  it('exports the constructor', function () {
+  it('exports the class', function () {
     expect(ShopifyToken).to.be.a('function');
   });
 
   it('throws an error when the required options are missing', function () {
-    expect(function () {
+    expect(() => {
       new ShopifyToken();
     }).to.throw(Error, /Missing or invalid options/);
 
-    expect(function () {
+    expect(() => {
       new ShopifyToken({ scopes: 'write_content' });
     }).to.throw(Error, /Missing or invalid options/);
-  });
-
-  it('makes the new operator optional', function () {
-    var shopifyToken = ShopifyToken({
-      sharedSecret: 'foo',
-      redirectUri: 'bar',
-      apiKey: 'baz'
-    });
-
-    expect(shopifyToken).to.be.an.instanceof(ShopifyToken);
   });
 
   it('uses a default scope', function () {
@@ -41,7 +32,7 @@ describe('shopify-token', function () {
   });
 
   it('allows to customize the default scopes', function () {
-    var shopifyToken = ShopifyToken({
+    const shopifyToken = new ShopifyToken({
       scopes: 'read_content,write_content',
       sharedSecret: 'foo',
       redirectUri: 'bar',
@@ -52,7 +43,7 @@ describe('shopify-token', function () {
   });
 
   it('allows to customize the request timeout', function () {
-    var shopifyToken = ShopifyToken({
+    const shopifyToken = new ShopifyToken({
       sharedSecret: 'foo',
       redirectUri: 'bar',
       apiKey: 'baz',
@@ -64,7 +55,7 @@ describe('shopify-token', function () {
 
   describe('#generateNonce', function () {
     it('generates a random nonce', function () {
-      var nonce = shopifyToken.generateNonce();
+      const nonce = shopifyToken.generateNonce();
 
       expect(nonce).to.be.a('string').and.have.length(32);
     });
@@ -72,8 +63,8 @@ describe('shopify-token', function () {
 
   describe('#generateAuthUrl', function () {
     it('builds the authorization URL', function () {
-      var uri = shopifyToken.generateAuthUrl('qux')
-        , nonce = url.parse(uri, true).query.state;
+      const uri = shopifyToken.generateAuthUrl('qux');
+      const nonce = url.parse(uri, true).query.state;
 
       expect(nonce).to.be.a('string').and.have.length(32);
       expect(uri).to.equal(url.format({
@@ -90,8 +81,8 @@ describe('shopify-token', function () {
     });
 
     it('allows to override the default scopes', function () {
-      var uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products')
-        , nonce = url.parse(uri, true).query.state;
+      const uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products');
+      const nonce = url.parse(uri, true).query.state;
 
       expect(nonce).to.be.a('string').and.have.length(32);
       expect(uri).to.equal(url.format({
@@ -108,11 +99,11 @@ describe('shopify-token', function () {
     });
 
     it('allows to use an array to override the scopes', function () {
-      var uri = shopifyToken.generateAuthUrl('qux', [
+      const uri = shopifyToken.generateAuthUrl('qux', [
         'read_products',
         'read_themes'
       ]);
-      var nonce = url.parse(uri, true).query.state;
+      const nonce = url.parse(uri, true).query.state;
 
       expect(nonce).to.be.a('string').and.have.length(32);
       expect(uri).to.equal(url.format({
@@ -129,7 +120,7 @@ describe('shopify-token', function () {
     });
 
     it('allows to use a custom nonce', function () {
-      var uri = shopifyToken.generateAuthUrl('qux', undefined, 'corge');
+      const uri = shopifyToken.generateAuthUrl('qux', undefined, 'corge');
 
       expect(uri).to.equal(url.format({
         pathname: '/admin/oauth/authorize',
@@ -176,52 +167,43 @@ describe('shopify-token', function () {
   });
 
   describe('#getAccessToken', function () {
-    var pathname = '/admin/oauth/access_token'
-      , hostname = 'qux.myshopify.com'
-      , scope = nock('https://' + hostname);
+    const pathname = '/admin/oauth/access_token';
+    const hostname = 'qux.myshopify.com';
+    const scope = nock(`https://${hostname}`);
 
     afterEach(function () {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('exchanges the auth code for the access token', function (done) {
-      var token = 'f85632530bf277ec9ac6f649fc327f17'
-        , code = '4d732838ad8c22cd1d2dd96f8a403fb7';
+    it('exchanges the auth code for the access token', function () {
+      const token = 'f85632530bf277ec9ac6f649fc327f17';
+      const code = '4d732838ad8c22cd1d2dd96f8a403fb7';
 
       scope
-        .post(pathname, {
-          client_secret: 'foo',
-          client_id: 'baz',
-          code: code
-        })
+        .post(pathname, { client_secret: 'foo', client_id: 'baz', code })
         .reply(200, { access_token: token });
 
-      shopifyToken.getAccessToken(hostname, code).then(function (res) {
-        console.log('123')
-        expect(res).to.equal(token);
-        done();
-      }).catch(function (err) {
-        console.log(err)
-      })
+      return shopifyToken.getAccessToken(hostname, code)
+        .then((res) => expect(res).to.equal(token));
     });
 
-    it('returns an error if the request fails', function (done) {
-      var message = 'Something wrong happened';
+    it('returns an error if the request fails', function () {
+      const message = 'Something wrong happened';
 
       scope
         .post(pathname)
         .replyWithError(message);
 
-      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
+      return shopifyToken.getAccessToken(hostname, '123456').then(() => {
+        throw new Error('Test invalidation');
+      }, (err) => {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal(message);
-        done();
-      })
-
+      });
     });
 
-    it('returns an error when timeout expires (headers)', function (done) {
-      var shopifyToken = ShopifyToken({
+    it('returns an error when timeout expires (headers)', function () {
+      const shopifyToken = new ShopifyToken({
         sharedSecret: 'foo',
         redirectUri: 'bar',
         apiKey: 'baz',
@@ -233,15 +215,16 @@ describe('shopify-token', function () {
         .delay({ head: 200 })
         .reply(200, {});
 
-      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
+      return shopifyToken.getAccessToken(hostname, '123456').then(() => {
+        throw new Error('Test invalidation');
+      }, (err) => {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal('Request timed out');
-        done();
-      })
+      });
     });
 
-    it('returns an error when timeout expires (body)', function (done) {
-      var shopifyToken = ShopifyToken({
+    it('returns an error when timeout expires (body)', function () {
+      const shopifyToken = new ShopifyToken({
         sharedSecret: 'foo',
         redirectUri: 'bar',
         apiKey: 'baz',
@@ -253,16 +236,16 @@ describe('shopify-token', function () {
         .delay({ body: 200 })
         .reply(200, {});
 
-      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
+      return shopifyToken.getAccessToken(hostname, '123456').then(() => {
+        throw new Error('Test invalidation');
+      }, (err) => {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal('Request timed out');
-        done();
       });
-
     });
 
-    it('returns an error when timeout expires (connection)', function (done) {
-      var shopifyToken = ShopifyToken({
+    it('returns an error when timeout expires (connection)', function () {
+      const shopifyToken = new ShopifyToken({
         sharedSecret: 'foo',
         redirectUri: 'bar',
         apiKey: 'baz',
@@ -272,45 +255,48 @@ describe('shopify-token', function () {
       //
       // `scope.delay()` can only delay the `response` event. The connection is
       // still established so it is useless for this test. To work around this
-      // issues a non-routable IP address is used here instead of `nock`. See
+      // issue a non-routable IP address is used here instead of `nock`. See
       // https://tools.ietf.org/html/rfc5737#section-3
       //
-      shopifyToken.getAccessToken('192.0.2.1', '123456').catch(function (err) {
+      return shopifyToken.getAccessToken('192.0.2.1', '123456').then(() => {
+        throw new Error('Test invalidation');
+      }, (err) => {
         expect(err).to.be.an.instanceof(Error);
         expect(err.message).to.equal('Request timed out');
-        done();
       });
     });
 
-    it('returns an error if response statusCode is not 200', function (done) {
-      var body = 'some error message from shopify';
+    it('returns an error if response statusCode is not 200', function () {
+      const body = 'some error message from shopify';
 
       scope
         .post(pathname)
         .reply(400, body);
 
-      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
+      return shopifyToken.getAccessToken(hostname, '123456').then(() => {
+        throw new Error('Test invalidation');
+      }, (err) => {
         expect(err).to.be.an.instanceof(Error);
         expect(err).to.have.property('message', 'Failed to get Shopify access token');
         expect(err).to.have.property('responseBody', body);
         expect(err).to.have.property('statusCode', 400);
-        done();
       });
     });
 
-    it('returns an error if JSON.parse throws', function (done) {
-      var body = '<!DOCTYPE html><html><head></head><body></body></html>';
+    it('returns an error if JSON.parse throws', function () {
+      const body = '<!DOCTYPE html><html><head></head><body></body></html>';
 
       scope
         .post(pathname)
         .reply(200, body);
 
-      shopifyToken.getAccessToken(hostname, '123456').catch(function (err) {
+      return shopifyToken.getAccessToken(hostname, '123456').then(() => {
+        throw new Error('Test invalidation');
+      }, (err) => {
         expect(err).to.be.an.instanceof(Error);
         expect(err).to.have.property('message', 'Failed to parse the response body');
         expect(err).to.have.property('responseBody', body);
         expect(err).to.have.property('statusCode', 200);
-        done();
       });
     });
   });
