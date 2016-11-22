@@ -25,8 +25,8 @@
   "devDependencies": {
     "chai": "3.5.x",
     "istanbul": "0.4.x",
-    "mocha": "3.0.x",
-    "nock": "8.0.x",
+    "mocha": "3.1.x",
+    "nock": "9.0.x",
     "pre-commit": "1.1.x"
   }
 }
