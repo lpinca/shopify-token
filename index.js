@@ -103,11 +103,11 @@ class ShopifyToken {
     const pairs = Object.keys(query)
       .filter((key) => key !== 'signature' && key !== 'hmac')
       .map((key) => {
-        const value = query[key];
+        const value = Array.isArray(query[key])
+          ? `["${query[key].join('", "')}"]`
+          : String(query[key]);
 
-        return typeof value === 'string'
-          ? `${encodeKey(key)}=${encodeValue(value)}`
-          : '';
+        return `${encodeKey(key)}=${encodeValue(value)}`;
       })
       .sort();
 

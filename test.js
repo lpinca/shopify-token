@@ -145,6 +145,14 @@ describe('shopify-token', function () {
         shop: 'qux.myshopify.com',
         timestamp: '1451929074'
       })).to.equal(true);
+
+      expect(shopifyToken.verifyHmac({
+        hmac: 'ffe89c5d47dd26297d47b68e6ad14cf4ee6f11a72b3da7c7a0974d0c3959579a',
+        shop: 'qux.myshopify.com',
+        timestamp: '1492784493',
+        quuz: [1, 2],
+        corge: 'grault'
+      })).to.equal(true);
     });
 
     it('returns false if the message is not authentic', function () {
@@ -159,10 +167,6 @@ describe('shopify-token', function () {
 
     it('returns false if the query object is empty', function () {
       expect(shopifyToken.verifyHmac({})).to.equal(false);
-    });
-
-    it('returns false if the properties values are not strings', function () {
-      expect(shopifyToken.verifyHmac({ foo: [1, 2] })).to.equal(false);
     });
   });
 
