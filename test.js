@@ -80,6 +80,24 @@ describe('shopify-token', function () {
       }));
     });
 
+    it("allows to use the shop's myshopify.com domain as shop name", function () {
+      const uri = shopifyToken.generateAuthUrl('qux.myshopify.com');
+      const nonce = url.parse(uri, true).query.state;
+
+      expect(nonce).to.be.a('string').and.have.length(32);
+      expect(uri).to.equal(url.format({
+        pathname: '/admin/oauth/authorize',
+        hostname: 'qux.myshopify.com',
+        protocol: 'https:',
+        query: {
+          scope: 'read_content',
+          state: nonce,
+          redirect_uri: 'bar',
+          client_id: 'baz'
+        }
+      }));
+    });
+
     it('allows to override the default scopes', function () {
       const uri = shopifyToken.generateAuthUrl('qux', 'read_themes,read_products');
       const nonce = url.parse(uri, true).query.state;
