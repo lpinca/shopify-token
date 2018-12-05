@@ -25,9 +25,9 @@
     "oauth"
   ],
   "devDependencies": {
-    "chai": "4.1.x",
+    "chai": "4.2.x",
     "istanbul": "0.4.x",
-    "mocha": "5.0.x",
+    "mocha": "5.2.x",
     "nock": "9.1.x",
     "pre-commit": "1.2.x"
   }
