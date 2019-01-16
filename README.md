@@ -40,7 +40,7 @@ Creates a new `ShopifyToken` instance.
 - `timeout` - Optional - A number that specifies the milliseconds to wait for
   the server to send a response to the HTTPS request initiated by the
   `getAccessToken` method before aborting it. Defaults to 60000, or 1 minute.
-- `access_mode` - Optional - A string representing [API access modes](https://help.shopify.com/en/api/getting-started/authentication/oauth/api-access-modes), `'online'` or `'offline'`.
+- `access_mode` - Optional - A string representing [API access modes](https://help.shopify.com/en/api/getting-started/authentication/oauth/api-access-modes). Set this parameter to `per-user` to receive an access token that respects the user’s permission level when making API requests (called online access). This is strongly recommended for embedded apps.
 
 #### Return value
 
@@ -145,7 +145,7 @@ Exchanges the authorization code for a permanent access token.
   by Shopify in the confirmation redirect.
 - `code` - The authorization Code. You can get this from the `code` parameter
   passed by Shopify in the confirmation redirect.
-- `shouldReturnAllData` - Optional - A boolean with a default of `false` which only returns **access_token**. Setting this to true will return the full payload which is helpful when access_mode is set to online.  
+- `shouldReturnAllData` - Optional - A boolean with a default of `false` which only returns **access_token**. Setting this to true will return the full payload which is helpful when access_mode is set to `per-user`.  
 
 #### Return value
 

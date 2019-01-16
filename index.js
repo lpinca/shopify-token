@@ -84,7 +84,7 @@ class ShopifyToken {
       state: nonce || this.generateNonce(),
       redirect_uri: this.redirectUri,
       client_id: this.apiKey,
-      'grant_options[]': this.access_mode === 'online' ? 'per-user' : ''
+      'grant_options[]': this.access_mode
     };
 
     return url.format({
