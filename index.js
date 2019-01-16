@@ -36,6 +36,7 @@ class ShopifyToken {
    * @param {String} options.sharedSecret The Shared Secret for the app
    * @param {Array|String} [options.scopes] The list of scopes
    * @param {String} options.apiKey The API Key for the app
+   * @param {String} options.access_mode The API access mode
    * @param {Number} [options.timeout] The request timeout
    */
   constructor(options) {
@@ -53,6 +54,7 @@ class ShopifyToken {
     this.sharedSecret = options.sharedSecret;
     this.redirectUri = options.redirectUri;
     this.apiKey = options.apiKey;
+    this.access_mode = options.access_mode || '';
   }
 
   /**
@@ -81,7 +83,8 @@ class ShopifyToken {
       scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
       state: nonce || this.generateNonce(),
       redirect_uri: this.redirectUri,
-      client_id: this.apiKey
+      client_id: this.apiKey,
+      'grant_options[]': this.access_mode === 'online' ? 'per-user' : ''
     };
 
     return url.format({
@@ -123,10 +126,11 @@ class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
+   * @param {Boolean} shouldReturnAllData Should the full payload be returned or only access_token
    * @return {Promise} Promise which is fulfilled with the token
    * @public
    */
-  getAccessToken(shop, code) {
+  getAccessToken(shop, code, shouldReturnAllData = false) {
     return new Promise((resolve, reject) => {
       const data = JSON.stringify({
         client_secret: this.sharedSecret,
@@ -179,8 +183,9 @@ class ShopifyToken {
             error.statusCode = status;
             return reject(error);
           }
-
-          resolve(body.access_token);
+          
+          const tokenData = shouldReturnAllData ? body : body.access_token;
+          resolve(tokenData);
         });
       });
 
