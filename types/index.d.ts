@@ -10,6 +10,8 @@ declare namespace ShopifyToken {
     scopes?: string | string[];
     // The request timeout
     timeout?: number;
+    // API access mode
+    access_mode?: string;
   }
 }
 
@@ -22,6 +24,7 @@ declare class ShopifyToken {
    * @param {String} options.sharedSecret The Shared Secret for the app
    * @param {Array|String} [options.scopes] The list of scopes
    * @param {String} options.apiKey The API Key for the app
+   * @param {String} options.access_mode The API access mode
    * @param {Number} [options.timeout] The request timeout
    */
   constructor(options: ShopifyToken.ShopifyTokenOptions);
@@ -55,10 +58,11 @@ declare class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
+   * @param {Boolean} shouldReturnAllData Should the full payload be returned or only access_token
    * @return {Promise} Promise which is fulfilled with the token
    * @public
    */
-  getAccessToken(shop: string, code: string): Promise<string>;
+  getAccessToken(shop: string, code: string, shouldReturnAllData: boolean): Promise<string>;
 }
 
 export = ShopifyToken;
