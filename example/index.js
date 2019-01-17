@@ -52,7 +52,8 @@ app.get('/callback', (req, res) => {
   // Exchange the authorization code for a permanent access token.
   //
   shopifyToken.getAccessToken(req.query.shop, req.query.code)
-    .then((token) => {
+    .then((data) => {
+      const token = data.access_token;
       console.log(token);
 
       req.session.token = token;

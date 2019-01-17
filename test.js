@@ -31,6 +31,10 @@ describe('shopify-token', function () {
     expect(shopifyToken.scopes).to.equal('read_content');
   });
 
+  it('defaults to offline access mode', function () {
+    expect(shopifyToken.accessMode).to.equal('');
+  });
+
   it('allows to customize the default scopes', function () {
     const shopifyToken = new ShopifyToken({
       scopes: 'read_content,write_content',
@@ -40,6 +44,17 @@ describe('shopify-token', function () {
     });
 
     expect(shopifyToken.scopes).to.equal('read_content,write_content');
+  });
+
+  it('allows to customize the default access mode', function () {
+    const shopifyToken = new ShopifyToken({
+      accessMode: 'per-user',
+      sharedSecret: 'foo',
+      redirectUri: 'bar',
+      apiKey: 'baz'
+    });
+
+    expect(shopifyToken.accessMode).to.equal('per-user');
   });
 
   it('allows to customize the request timeout', function () {
@@ -152,6 +167,30 @@ describe('shopify-token', function () {
         }
       }));
     });
+
+    it('allows to override the default access mode', function () {
+      const uri = shopifyToken.generateAuthUrl(
+        'qux',
+        undefined,
+        undefined,
+        'per-user'
+      );
+      const nonce = url.parse(uri, true).query.state;
+
+      expect(nonce).to.be.a('string').and.have.length(32);
+      expect(uri).to.equal(url.format({
+        pathname: '/admin/oauth/authorize',
+        hostname: 'qux.myshopify.com',
+        protocol: 'https:',
+        query: {
+          scope: 'read_content',
+          state: nonce,
+          redirect_uri: 'bar',
+          client_id: 'baz',
+          'grant_options[]': 'per-user'
+        }
+      }));
+    });
   });
 
   describe('#verifyHmac', function () {
@@ -198,15 +237,18 @@ describe('shopify-token', function () {
     });
 
     it('exchanges the auth code for the access token', function () {
-      const token = 'f85632530bf277ec9ac6f649fc327f17';
       const code = '4d732838ad8c22cd1d2dd96f8a403fb7';
+      const reply =  {
+        access_token: 'f85632530bf277ec9ac6f649fc327f17',
+        scope: 'read_content'
+      };
 
       scope
         .post(pathname, { client_secret: 'foo', client_id: 'baz', code })
-        .reply(200, { access_token: token });
+        .reply(200, reply);
 
       return shopifyToken.getAccessToken(hostname, code)
-        .then((res) => expect(res).to.equal(token));
+        .then((data) => expect(data).to.deep.equal(reply));
     });
 
     it('returns an error if the request fails', function () {

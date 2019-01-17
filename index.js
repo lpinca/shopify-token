@@ -36,6 +36,7 @@ class ShopifyToken {
    * @param {String} options.sharedSecret The Shared Secret for the app
    * @param {Array|String} [options.scopes] The list of scopes
    * @param {String} options.apiKey The API Key for the app
+   * @param {String} [options.accessMode] The API access mode
    * @param {Number} [options.timeout] The request timeout
    */
   constructor(options) {
@@ -48,6 +49,7 @@ class ShopifyToken {
       throw new Error('Missing or invalid options');
     }
 
+    this.accessMode = 'accessMode' in options ? options.accessMode : '';
     this.scopes = 'scopes' in options ? options.scopes : 'read_content';
     this.timeout = 'timeout' in options ? options.timeout : 60000;
     this.sharedSecret = options.sharedSecret;
@@ -71,11 +73,13 @@ class ShopifyToken {
    * @param {String} shop The shop name
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
+   * @param {String} [accessMode] The API access mode
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop, scopes, nonce) {
+  generateAuthUrl(shop, scopes, nonce, accessMode) {
     scopes || (scopes = this.scopes);
+    accessMode || (accessMode = this.accessMode);
 
     const query = {
       scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
@@ -83,6 +87,10 @@ class ShopifyToken {
       redirect_uri: this.redirectUri,
       client_id: this.apiKey
     };
+
+    if (accessMode) {
+      query['grant_options[]'] = accessMode;
+    }
 
     return url.format({
       pathname: '/admin/oauth/authorize',
@@ -123,7 +131,8 @@ class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
-   * @return {Promise} Promise which is fulfilled with the token
+   * @return {Promise} Promise which is fulfilled with an access token and
+   *     additional data
    * @public
    */
   getAccessToken(shop, code) {
@@ -180,7 +189,7 @@ class ShopifyToken {
             return reject(error);
           }
 
-          resolve(body.access_token);
+          resolve(body);
         });
       });
 
