@@ -79,7 +79,7 @@ console.log(nonce);
 // => 212a8b839860d1aefb258aaffcdbd63f
 ```
 
-### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce]])`
+### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce[, access_mode]]])`
 
 Builds and returns the authorization URL where you should redirect the user.
 
@@ -90,6 +90,7 @@ Builds and returns the authorization URL where you should redirect the user.
   the list of scopes. This allows you to override the default scopes.
 - `nonce` - An optional string representing the nonce. If not provided it will
   be generated automatically.
+- `access_mode` - An optional string dictating the API access mode. If not provided it will use offline mode.
 
 #### Return value
 
@@ -136,7 +137,7 @@ console.log(ok);
 
 ### `shopifyToken.getAccessToken(hostname, code)`
 
-Exchanges the authorization code for a permanent access token.
+Exchanges the authorization code for a permanent access token. 
 
 #### Arguments
 
@@ -145,11 +146,10 @@ Exchanges the authorization code for a permanent access token.
   by Shopify in the confirmation redirect.
 - `code` - The authorization Code. You can get this from the `code` parameter
   passed by Shopify in the confirmation redirect.
-- `shouldReturnAllData` - Optional - A boolean with a default of `false` which only returns **access_token**. Setting this to true will return the full payload which is helpful when access_mode is set to `per-user`.  
 
 #### Return value
 
-A `Promise` which gets resolved with the `token`. When the exchange fails, you
+A `Promise` which gets resolved with the `token payload` object. When the exchange fails, you
 can read the HTTPS response status code and body from the `statusCode` and
 `responseBody` properties which are added to the error object.
 
@@ -159,8 +159,8 @@ can read the HTTPS response status code and body from the `statusCode` and
 const code = '4d732838ad8c22cd1d2dd96f8a403fb7'
 const hostname = 'dolciumi.myshopify.com';
 
-shopifyToken.getAccessToken(hostname, code).then((token) => {
-  console.log(token);
+shopifyToken.getAccessToken(hostname, code).then((data) => {
+  console.log(data.token);
   // => f85632530bf277ec9ac6f649fc327f17
 }).catch((err) => console.err(err));
 ```

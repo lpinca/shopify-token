@@ -73,18 +73,20 @@ class ShopifyToken {
    * @param {String} shop The shop name
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
+   * @param {String} [access_mode] The API access_mode 
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop, scopes, nonce) {
+  generateAuthUrl(shop, scopes, nonce, access_mode) {
     scopes || (scopes = this.scopes);
+    access_mode || (access_mode = this.access_mode);
 
     const query = {
       scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
       state: nonce || this.generateNonce(),
       redirect_uri: this.redirectUri,
       client_id: this.apiKey,
-      'grant_options[]': this.access_mode
+      'grant_options[]': access_mode
     };
 
     return url.format({
@@ -126,11 +128,10 @@ class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
-   * @param {Boolean} shouldReturnAllData Should the full payload be returned or only access_token
    * @return {Promise} Promise which is fulfilled with the token
    * @public
    */
-  getAccessToken(shop, code, shouldReturnAllData = false) {
+  getAccessToken(shop, code) {
     return new Promise((resolve, reject) => {
       const data = JSON.stringify({
         client_secret: this.sharedSecret,
@@ -184,8 +185,7 @@ class ShopifyToken {
             return reject(error);
           }
           
-          const tokenData = shouldReturnAllData ? body : body.access_token;
-          resolve(tokenData);
+          resolve(body);
         });
       });
 

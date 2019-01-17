@@ -41,10 +41,11 @@ declare class ShopifyToken {
    * @param {String} shop The shop name
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
+   * @param {String} [access_mode] The API access_mode
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string): string;
+  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, access_mode?: string): string;
   /**
    * Verify the hmac returned by Shopify.
    *
@@ -58,11 +59,10 @@ declare class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
-   * @param {Boolean} shouldReturnAllData Should the full payload be returned or only access_token
-   * @return {Promise} Promise which is fulfilled with the token
+   * @return {Promise} Promise which is fulfilled with the token data object
    * @public
    */
-  getAccessToken(shop: string, code: string, shouldReturnAllData: boolean): Promise<string>;
+  getAccessToken(shop: string, code: string): Promise<object>;
 }
 
 export = ShopifyToken;
