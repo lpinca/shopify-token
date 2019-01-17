@@ -11,7 +11,7 @@ declare namespace ShopifyToken {
     // The request timeout
     timeout?: number;
     // API access mode
-    access_mode?: string;
+    accessMode?: string;
   }
 }
 
@@ -24,7 +24,7 @@ declare class ShopifyToken {
    * @param {String} options.sharedSecret The Shared Secret for the app
    * @param {Array|String} [options.scopes] The list of scopes
    * @param {String} options.apiKey The API Key for the app
-   * @param {String} options.access_mode The API access mode
+   * @param {String} [options.accessMode] The API access mode
    * @param {Number} [options.timeout] The request timeout
    */
   constructor(options: ShopifyToken.ShopifyTokenOptions);
@@ -41,11 +41,11 @@ declare class ShopifyToken {
    * @param {String} shop The shop name
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
-   * @param {String} [access_mode] The API access_mode
+   * @param {String} [accessMode] The API access mode
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, access_mode?: string): string;
+  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, accessMode?: string): string;
   /**
    * Verify the hmac returned by Shopify.
    *
@@ -59,7 +59,8 @@ declare class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
-   * @return {Promise} Promise which is fulfilled with the token data object
+   * @return {Promise} Promise which is fulfilled with an access token and
+   *     additional data
    * @public
    */
   getAccessToken(shop: string, code: string): Promise<object>;

@@ -5,9 +5,9 @@
 [![Coverage Status][coverage-shopify-token-badge]][coverage-shopify-token]
 
 This module helps you retrieve an access token for the Shopify REST API. It
-provides some convenience methods that can be used when implementing the
-[OAuth 2.0 flow][shopify-oauth-doc]. No assumptions are made about your
-server-side architecture, allowing the module to easily adapt to any setup.
+provides some convenience methods that can be used when implementing the [OAuth
+2.0 flow][shopify-oauth-doc]. No assumptions are made about your server-side
+architecture, allowing the module to easily adapt to any setup.
 
 ## Install
 
@@ -40,7 +40,11 @@ Creates a new `ShopifyToken` instance.
 - `timeout` - Optional - A number that specifies the milliseconds to wait for
   the server to send a response to the HTTPS request initiated by the
   `getAccessToken` method before aborting it. Defaults to 60000, or 1 minute.
-- `access_mode` - Optional - A string representing [API access modes](https://help.shopify.com/en/api/getting-started/authentication/oauth/api-access-modes). Set this parameter to `per-user` to receive an access token that respects the user’s permission level when making API requests (called online access). This is strongly recommended for embedded apps.
+- `accessMode` - Optional - A string representing the [API access
+  modes][api-access-mode]. Set this parameter to `'per-user'` to receive an
+  access token that respects the user's permission level when making API
+  requests (called online access). This is strongly recommended for embedded
+  apps.
 
 #### Return value
 
@@ -79,7 +83,7 @@ console.log(nonce);
 // => 212a8b839860d1aefb258aaffcdbd63f
 ```
 
-### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce[, access_mode]]])`
+### `shopifyToken.generateAuthUrl(shop[, scopes[, nonce[, accessMode]]])`
 
 Builds and returns the authorization URL where you should redirect the user.
 
@@ -90,7 +94,8 @@ Builds and returns the authorization URL where you should redirect the user.
   the list of scopes. This allows you to override the default scopes.
 - `nonce` - An optional string representing the nonce. If not provided it will
   be generated automatically.
-- `access_mode` - An optional string dictating the API access mode. If not provided it will use offline mode.
+- `accessMode` - An optional string dictating the API access mode. If not
+  provided it will use offline mode.
 
 #### Return value
 
@@ -137,42 +142,51 @@ console.log(ok);
 
 ### `shopifyToken.getAccessToken(hostname, code)`
 
-Exchanges the authorization code for a permanent access token. 
+Exchanges the authorization code for a permanent access token.
 
 #### Arguments
 
-- `hostname` - A string that specifies the hostname of the user's shop.
-  e.g. `foo.myshopify.com`. You can get this from the `shop` parameter passed
-  by Shopify in the confirmation redirect.
+- `hostname` - A string that specifies the hostname of the user's shop. e.g.
+  `foo.myshopify.com`. You can get this from the `shop` parameter passed by
+  Shopify in the confirmation redirect.
 - `code` - The authorization Code. You can get this from the `code` parameter
   passed by Shopify in the confirmation redirect.
 
 #### Return value
 
-A `Promise` which gets resolved with the `token payload` object. When the exchange fails, you
-can read the HTTPS response status code and body from the `statusCode` and
-`responseBody` properties which are added to the error object.
+A `Promise` which gets resolved with an access token and additional data. When
+the exchange fails, you can read the HTTPS response status code and body from
+the `statusCode` and `responseBody` properties which are added to the error
+object.
 
 #### Example
 
 ```js
-const code = '4d732838ad8c22cd1d2dd96f8a403fb7'
+const code = '4d732838ad8c22cd1d2dd96f8a403fb7';
 const hostname = 'dolciumi.myshopify.com';
 
-shopifyToken.getAccessToken(hostname, code).then((data) => {
-  console.log(data.token);
-  // => f85632530bf277ec9ac6f649fc327f17
-}).catch((err) => console.err(err));
+shopifyToken
+  .getAccessToken(hostname, code)
+  .then(data => {
+    console.log(data);
+    // => { access_token: 'f85632530bf277ec9ac6f649fc327f17', scope: 'read_content' }
+  })
+  .catch(err => console.err(err));
 ```
 
 ## License
 
 [MIT](LICENSE)
 
+[api-access-mode]:
+  https://help.shopify.com/en/api/getting-started/authentication/oauth/api-access-modes
 [npm-shopify-token-badge]: https://img.shields.io/npm/v/shopify-token.svg
 [npm-shopify-token]: https://www.npmjs.com/package/shopify-token
-[travis-shopify-token-badge]: https://img.shields.io/travis/lpinca/shopify-token/master.svg
+[travis-shopify-token-badge]:
+  https://img.shields.io/travis/lpinca/shopify-token/master.svg
 [travis-shopify-token]: https://travis-ci.org/lpinca/shopify-token
-[coverage-shopify-token-badge]: https://img.shields.io/coveralls/lpinca/shopify-token/master.svg
-[coverage-shopify-token]: https://coveralls.io/r/lpinca/shopify-token?branch=master
+[coverage-shopify-token-badge]:
+  https://img.shields.io/coveralls/lpinca/shopify-token/master.svg
+[coverage-shopify-token]:
+  https://coveralls.io/r/lpinca/shopify-token?branch=master
 [shopify-oauth-doc]: https://help.shopify.com/api/guides/authentication/oauth

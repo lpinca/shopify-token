@@ -36,7 +36,7 @@ class ShopifyToken {
    * @param {String} options.sharedSecret The Shared Secret for the app
    * @param {Array|String} [options.scopes] The list of scopes
    * @param {String} options.apiKey The API Key for the app
-   * @param {String} options.access_mode The API access mode
+   * @param {String} [options.accessMode] The API access mode
    * @param {Number} [options.timeout] The request timeout
    */
   constructor(options) {
@@ -49,12 +49,12 @@ class ShopifyToken {
       throw new Error('Missing or invalid options');
     }
 
+    this.accessMode = 'accessMode' in options ? options.accessMode : '';
     this.scopes = 'scopes' in options ? options.scopes : 'read_content';
     this.timeout = 'timeout' in options ? options.timeout : 60000;
     this.sharedSecret = options.sharedSecret;
     this.redirectUri = options.redirectUri;
     this.apiKey = options.apiKey;
-    this.access_mode = options.access_mode || '';
   }
 
   /**
@@ -73,21 +73,24 @@ class ShopifyToken {
    * @param {String} shop The shop name
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
-   * @param {String} [access_mode] The API access_mode 
+   * @param {String} [accessMode] The API access mode
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop, scopes, nonce, access_mode) {
+  generateAuthUrl(shop, scopes, nonce, accessMode) {
     scopes || (scopes = this.scopes);
-    access_mode || (access_mode = this.access_mode);
+    accessMode || (accessMode = this.accessMode);
 
     const query = {
       scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
       state: nonce || this.generateNonce(),
       redirect_uri: this.redirectUri,
-      client_id: this.apiKey,
-      'grant_options[]': access_mode
+      client_id: this.apiKey
     };
+
+    if (accessMode) {
+      query['grant_options[]'] = accessMode;
+    }
 
     return url.format({
       pathname: '/admin/oauth/authorize',
@@ -184,7 +187,7 @@ class ShopifyToken {
             error.statusCode = status;
             return reject(error);
           }
-          
+
           resolve(body);
         });
       });
