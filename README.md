@@ -41,10 +41,10 @@ Creates a new `ShopifyToken` instance.
   the server to send a response to the HTTPS request initiated by the
   `getAccessToken` method before aborting it. Defaults to 60000, or 1 minute.
 - `accessMode` - Optional - A string representing the [API access
-  modes][api-access-mode]. Set this parameter to `'per-user'` to receive an
-  access token that respects the user's permission level when making API
-  requests (called online access). This is strongly recommended for embedded
-  apps.
+  modes][api-access-mode]. Set this option to `'per-user'` to receive an access
+  token that respects the user's permission level when making API requests
+  (called online access). This is strongly recommended for embedded apps.
+  Defaults to offline access mode.
 
 #### Return value
 
@@ -95,7 +95,8 @@ Builds and returns the authorization URL where you should redirect the user.
 - `nonce` - An optional string representing the nonce. If not provided it will
   be generated automatically.
 - `accessMode` - An optional string dictating the API access mode. If not
-  provided it will use offline mode.
+  provided the access mode defined by the `accessMode` constructor option will
+  be used.
 
 #### Return value
 

@@ -131,7 +131,8 @@ class ShopifyToken {
    *
    * @param {String} shop The hostname of the shop, e.g. foo.myshopify.com
    * @param {String} code The authorization code
-   * @return {Promise} Promise which is fulfilled with the token
+   * @return {Promise} Promise which is fulfilled with an access token and
+   *     additional data
    * @public
    */
   getAccessToken(shop, code) {
