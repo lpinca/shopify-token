@@ -74,12 +74,14 @@ class ShopifyToken {
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
    * @param {String} [accessMode] The API access mode
+   * @param {String} redirectUri The redirect URL for the Oauth2 flow
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop, scopes, nonce, accessMode) {
+  generateAuthUrl(shop, scopes, nonce, accessMode, redirectUri) {
     scopes || (scopes = this.scopes);
     accessMode || (accessMode = this.accessMode);
+    redirectUri || (redirectUri = this.redirectUri);
 
     const query = {
       scope: Array.isArray(scopes) ? scopes.join(',') : scopes,
