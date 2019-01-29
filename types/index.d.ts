@@ -42,10 +42,11 @@ declare class ShopifyToken {
    * @param {Array|String} [scopes] The list of scopes
    * @param {String} [nonce] The nonce
    * @param {String} [accessMode] The API access mode
+   * @param {String} redirectUri The redirect URL for the Oauth2 flow
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, accessMode?: string): string;
+  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, accessMode?: string, redirectUri?: string): string;
   /**
    * Verify the hmac returned by Shopify.
    *
