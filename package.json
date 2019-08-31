@@ -9,9 +9,7 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test-travis": "istanbul cover -x test.js _mocha --report lcovonly",
-    "coverage": "istanbul cover -x test.js _mocha",
-    "test": "mocha"
+    "test": "nyc --reporter=html --reporter=text mocha"
   },
   "files": [
     "index.js",
@@ -26,9 +24,9 @@
   ],
   "devDependencies": {
     "chai": "4.2.x",
-    "istanbul": "0.4.x",
     "mocha": "6.2.x",
     "nock": "10.0.x",
+    "nyc": "14.1.x",
     "pre-commit": "1.2.x"
   }
 }
