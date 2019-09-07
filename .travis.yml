@@ -4,4 +4,4 @@ node_js:
   - "10"
   - "8"
 after_success:
-  - nyc report --reporter=text-lcov | coveralls
+  - "npm install coveralls@3 && nyc report --reporter=text-lcov | coveralls"
