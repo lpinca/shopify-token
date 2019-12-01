@@ -185,7 +185,7 @@ shopifyToken
 [npm-shopify-token]: https://www.npmjs.com/package/shopify-token
 [travis-shopify-token-badge]:
   https://img.shields.io/travis/lpinca/shopify-token/master.svg
-[travis-shopify-token]: https://travis-ci.org/lpinca/shopify-token
+[travis-shopify-token]: https://travis-ci.com/lpinca/shopify-token
 [coverage-shopify-token-badge]:
   https://img.shields.io/coveralls/lpinca/shopify-token/master.svg
 [coverage-shopify-token]:
