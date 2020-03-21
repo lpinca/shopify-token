@@ -23,11 +23,11 @@
     "oauth"
   ],
   "devDependencies": {
-    "chai": "4.2.x",
-    "coveralls": "3.0.x",
-    "mocha": "7.1.x",
-    "nock": "11.3.x",
-    "nyc": "15.0.x",
-    "pre-commit": "1.2.x"
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.11",
+    "mocha": "^7.1.1",
+    "nock": "^11.3.6",
+    "nyc": "^15.0.0",
+    "pre-commit": "^1.2.2"
   }
 }
