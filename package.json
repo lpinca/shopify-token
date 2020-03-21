@@ -27,7 +27,7 @@
     "coveralls": "3.0.x",
     "mocha": "7.1.x",
     "nock": "11.3.x",
-    "nyc": "14.1.x",
+    "nyc": "15.0.x",
     "pre-commit": "1.2.x"
   }
 }
