@@ -227,6 +227,37 @@ describe('shopify-token', function () {
     });
   });
 
+  describe('#verifySignature', function () {
+    it('returns true if the message is authentic', function () {
+      expect(shopifyToken.verifySignature({
+        signature: '6db61cb63062ff26bd610fd44e475f3a0bdb7f4c7ab62efdbe84e47f43299128',
+        path: '/a/poc',
+        shop: 'test.myshopify.com',
+        timestamp: '1451929074'
+      })).to.equal(true);
+
+      expect(shopifyToken.verifySignature({
+        signature: 'cfcdb22a3f1ce46614111ca20ac2b661d581b1ab75334814ac067b74941eb2e3',
+        path: '/apps/poc',
+        shop: 'test.myshopify.com',
+        timestamp: '1451929074'
+      })).to.equal(true);
+    });
+
+    it('returns false if the message is not authentic', function () {
+      expect(shopifyToken.verifySignature({
+        signature: '3d9b9a7918ac20dfd03b6a0af54a58f0a47980145ae81a37f41597a1e34b528d',
+        path: '/a/poc',
+        shop: 'test.myshopify.com',
+        timestamp: '1451929075'
+      })).to.equal(false);
+    });
+
+    it('returns false if the query object is empty', function () {
+      expect(shopifyToken.verifyHmac({})).to.equal(false);
+    });
+  });
+
   describe('#getAccessToken', function () {
     const pathname = '/admin/oauth/access_token';
     const hostname = 'qux.myshopify.com';

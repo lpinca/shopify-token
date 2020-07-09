@@ -25,6 +25,36 @@ const encodeValue = (input) => input.replace(/[%&]/g, encodeURIComponent);
 const encodeKey = (input) => input.replace(/[%&=]/g, encodeURIComponent);
 
 /**
+ * Verify against a specified key and separator.
+ *
+ * @param {Object} query The query string object
+ * @param {String} sharedSecret The Shared Secret for the app
+ * @param {String} verifyKey which key from query to verify against
+ * @param {String} joinSeparator what seperator to use when concatenating query parameters
+ * @return {Boolean} `true` if valid, else `false`
+ * @public
+ */
+function verify(query, sharedSecret, verifyKey, joinSeparator) {
+
+  const pairs = Object.keys(query)
+    .filter((key) => key !== 'signature' && key !== 'hmac')
+    .map((key) => {
+      const value = Array.isArray(query[key])
+        ? `["${query[key].join('", "')}"]`
+        : String(query[key]);
+
+      return `${encodeKey(key)}=${encodeValue(value)}`;
+    })
+    .sort();
+
+  const digest = crypto.createHmac('sha256', sharedSecret)
+    .update(pairs.join(joinSeparator))
+    .digest('hex');
+
+  return digest === query[verifyKey];
+}
+
+/**
  * ShopifyToken class.
  */
 class ShopifyToken {
@@ -108,22 +138,18 @@ class ShopifyToken {
    * @public
    */
   verifyHmac(query) {
-    const pairs = Object.keys(query)
-      .filter((key) => key !== 'signature' && key !== 'hmac')
-      .map((key) => {
-        const value = Array.isArray(query[key])
-          ? `["${query[key].join('", "')}"]`
-          : String(query[key]);
+    return verify(query, this.sharedSecret, 'hmac', '&');
+  }
 
-        return `${encodeKey(key)}=${encodeValue(value)}`;
-      })
-      .sort();
-
-    const digest = crypto.createHmac('sha256', this.sharedSecret)
-      .update(pairs.join('&'))
-      .digest('hex');
-
-    return digest === query.hmac;
+  /**
+   * Verify the signature returned by Shopify.
+   *
+   * @param {Object} query The query string object
+   * @return {Boolean} `true` if the signature is valid, else `false`
+   * @public
+   */
+  verifySignature(query) {
+    return verify(query, this.sharedSecret, 'signature', '');
   }
 
   /**
