@@ -1,7 +1,7 @@
 # shopify-token
 
 [![Version npm][npm-shopify-token-badge]][npm-shopify-token]
-[![Build Status][travis-shopify-token-badge]][travis-shopify-token]
+[![Build Status][ci-shopify-token-badge]][ci-shopify-token]
 [![Coverage Status][coverage-shopify-token-badge]][coverage-shopify-token]
 
 This module helps you retrieve an access token for the Shopify REST API. It
@@ -168,11 +168,11 @@ const hostname = 'dolciumi.myshopify.com';
 
 shopifyToken
   .getAccessToken(hostname, code)
-  .then(data => {
+  .then((data) => {
     console.log(data);
     // => { access_token: 'f85632530bf277ec9ac6f649fc327f17', scope: 'read_content' }
   })
-  .catch(err => console.err(err));
+  .catch((err) => console.err(err));
 ```
 
 ## License
@@ -183,9 +183,10 @@ shopifyToken
   https://shopify.dev/concepts/about-apis/authentication#api-access-modes
 [npm-shopify-token-badge]: https://img.shields.io/npm/v/shopify-token.svg
 [npm-shopify-token]: https://www.npmjs.com/package/shopify-token
-[travis-shopify-token-badge]:
-  https://img.shields.io/travis/lpinca/shopify-token/master.svg
-[travis-shopify-token]: https://travis-ci.com/lpinca/shopify-token
+[ci-shopify-token-badge]:
+  https://img.shields.io/github/workflow/status/lpinca/shopify-token/CI/master?label=CI
+[ci-shopify-token]:
+  https://github.com/lpinca/shopify-token/actions?query=workflow%3ACI+branch%3Amaster
 [coverage-shopify-token-badge]:
   https://img.shields.io/coveralls/lpinca/shopify-token/master.svg
 [coverage-shopify-token]:
