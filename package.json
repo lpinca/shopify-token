@@ -8,6 +8,9 @@
   "author": "Luigi Pinca",
   "license": "MIT",
   "main": "index.js",
+  "engines": {
+    "node": ">=6.6.0"
+  },
   "scripts": {
     "test": "c8 --reporter=lcov --reporter=text mocha"
   },
