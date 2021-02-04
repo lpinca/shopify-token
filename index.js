@@ -119,11 +119,18 @@ class ShopifyToken {
       })
       .sort();
 
+    if (
+      typeof query.hmac !== 'string' ||
+      Buffer.byteLength(query.hmac) !== 64
+    ) {
+      return false;
+    }
+
     const digest = crypto.createHmac('sha256', this.sharedSecret)
       .update(pairs.join('&'))
-      .digest('hex');
+      .digest();
 
-    return digest === query.hmac;
+    return crypto.timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
   }
 
   /**
