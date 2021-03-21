@@ -49,11 +49,11 @@ declare class ShopifyToken {
   /**
    * Verify the hmac returned by Shopify.
    *
-   * @param {Object} query The query string object
+   * @param {String} query The query string object
    * @return {Boolean} `true` if the hmac is valid, else `false`
    * @public
    */
-  verifyHmac(query: any): boolean;
+  verifyHmac(query: string): boolean;
   /**
    * Request an access token.
    *
