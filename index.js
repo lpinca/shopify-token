@@ -103,7 +103,7 @@ class ShopifyToken {
   /**
    * Verify the hmac returned by Shopify.
    *
-   * @param {Object} query The query string object
+   * @param {Object} query The query object, e.g. `{hmac: "fd4c", timestamp: 1337178173}`
    * @return {Boolean} `true` if the hmac is valid, else `false`
    * @public
    */
