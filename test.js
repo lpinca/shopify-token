@@ -210,6 +210,13 @@ describe('shopify-token', function () {
         quuz: [1, 2],
         corge: 'grault'
       })).to.equal(true);
+
+      expect (shopifyToken.verifyHmac("hmac=3d9b9a7918ac20dfd03b6a0af54a58f0a47980145ae81a37f41597a1e34b528d" +
+        "&code=4d732838ad8c22cd1d2dd96f8a403fb7" +
+        "&shop=qux.myshopify.com" +
+        "&state=b77827e928ee8eee614b5808d3276c8a" +
+        "&timestamp=1451929074"
+      )).to.equal(true);
     });
 
     it('returns false if the message is not authentic', function () {

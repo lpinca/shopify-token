@@ -102,35 +102,55 @@ class ShopifyToken {
 
   /**
    * Verify the hmac returned by Shopify.
+   * The query can either be passed as a string or an object. Using a string has the advantage that order is guaranteed;
+   * if you use an object, then the order is not guaranteed so the hmac may erroneously fail to be verified.
    *
-   * @param {Object} query The query object, e.g. `{hmac: "fd4c", timestamp: 1337178173}`
+   * @param {Object | string} query Either the query object, e.g. `{hmac: "fd4c", timestamp: 1337178173}`,
+   * or the query string, e.g. `"hmac=fd4c&timestamp=1337178173"`
    * @return {Boolean} `true` if the hmac is valid, else `false`
    * @public
    */
   verifyHmac(query) {
-    const pairs = Object.keys(query)
-      .filter((key) => key !== 'signature' && key !== 'hmac')
-      .map((key) => {
-        const value = Array.isArray(query[key])
-          ? `["${query[key].join('", "')}"]`
-          : String(query[key]);
+    let hmac;
+    let dataForHmac;
 
-        return `${encodeKey(key)}=${encodeValue(value)}`;
-      })
-      .sort();
+    if (typeof query === 'string') {
+      const queryParts = query.split('&');
+      hmac = queryParts && queryParts.filter(each => each.startsWith('hmac='))[0];
+      hmac = hmac && hmac.split("hmac=")[1]
+      const queryPartsWithoutHmac = queryParts && queryParts.filter(each => !each.startsWith('hmac='))
+      dataForHmac = queryPartsWithoutHmac && queryPartsWithoutHmac.join('&');
+      if (!hmac || !dataForHmac) {
+        return false;
+      }
+    } else {
+      const pairs = Object.keys(query)
+        .filter((key) => key !== 'signature' && key !== 'hmac')
+        .map((key) => {
+          const value = Array.isArray(query[key])
+            ? `["${query[key].join('", "')}"]`
+            : String(query[key]);
 
-    if (
-      typeof query.hmac !== 'string' ||
-      Buffer.byteLength(query.hmac) !== 64
-    ) {
-      return false;
+          return `${encodeKey(key)}=${encodeValue(value)}`;
+        })
+        .sort();
+
+      if (
+        typeof query.hmac !== 'string' ||
+        Buffer.byteLength(query.hmac) !== 64
+      ) {
+        return false;
+      }
+
+      hmac = query.hmac
+      dataForHmac = pairs.join('&');
     }
 
     const digest = crypto.createHmac('sha256', this.sharedSecret)
-      .update(pairs.join('&'))
+      .update(dataForHmac)
       .digest();
 
-    return crypto.timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
+    return crypto.timingSafeEqual(digest, Buffer.from(hmac, 'hex'));
   }
 
   /**

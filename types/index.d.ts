@@ -48,12 +48,15 @@ declare class ShopifyToken {
   generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, accessMode?: string): string;
   /**
    * Verify the hmac returned by Shopify.
+   * The query can either be passed as a string or an object. Using a string has the advantage that order is guaranteed;
+   * if you use an object, then the order is not guaranteed so the hmac may erroneously fail to be verified.
    *
-   * @param {Object} query The query string object
+   * @param {Object | string} query Either the query object, e.g. `{hmac: "fd4c", timestamp: 1337178173}`,
+   * or the query string, e.g. `"hmac=fd4c&timestamp=1337178173"`
    * @return {Boolean} `true` if the hmac is valid, else `false`
    * @public
    */
-  verifyHmac(query: any): boolean;
+  verifyHmac(query: any | string): boolean;
   /**
    * Request an access token.
    *
