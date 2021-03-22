@@ -25,7 +25,7 @@ Creates a new `ShopifyToken` instance.
 
 #### Arguments
 
-- `options` - A plain JavaScript objet e.g. `{ apiKey: 'YOUR_API_KEY' }`.
+- `options` - A plain JavaScript object, e.g. `{ apiKey: 'YOUR_API_KEY' }`.
 
 #### Options
 
