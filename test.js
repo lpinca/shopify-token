@@ -232,6 +232,10 @@ describe('shopify-token', function () {
     it('returns false if the query object is empty', function () {
       expect(shopifyToken.verifyHmac({})).to.equal(false);
     });
+
+    it('returns false if the query object is an empty string', function () {
+      expect(shopifyToken.verifyHmac("")).to.equal(false);
+    });
   });
 
   describe('#getAccessToken', function () {
