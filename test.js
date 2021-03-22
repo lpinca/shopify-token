@@ -236,6 +236,12 @@ describe('shopify-token', function () {
     it('returns false if the query object is an empty string', function () {
       expect(shopifyToken.verifyHmac("")).to.equal(false);
     });
+
+    it('returns false if the query object doesn\'t have an hmac', function () {
+      expect(shopifyToken.verifyHmac("timestamp=100&shop=qux.myshopify.com")).to.equal(false);
+
+      expect(shopifyToken.verifyHmac({timestamp: 100, shop: 'qux.myshopify.com'})).to.equal(false);
+    });
   });
 
   describe('#getAccessToken', function () {
