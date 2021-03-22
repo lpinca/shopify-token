@@ -63,7 +63,7 @@ declare class ShopifyToken {
    *     additional data
    * @public
    */
-  getAccessToken(shop: string, code: string): Promise<object>;
+  getAccessToken(shop: string, code: string): Promise<Record<string, string>>;
 }
 
 export = ShopifyToken;
