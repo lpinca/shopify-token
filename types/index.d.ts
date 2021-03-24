@@ -13,6 +13,30 @@ declare namespace ShopifyToken {
     // API access mode
     accessMode?: string;
   }
+
+  export interface OfflineAccessTokenData {
+    access_token: string;
+    scope: string;
+  }
+
+  export interface AccessTokenAssociatedUser {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    email_verified: boolean;
+    account_owner: boolean;
+    locale: string;
+    collaborator: boolean;
+  }
+
+  export interface OnlineAccessTokenData {
+    access_token: string;
+    scope: string;
+    expires_in: number;
+    associated_user_scope: string;
+    associated_user: AccessTokenAssociatedUser;
+  }
 }
 
 declare class ShopifyToken {
@@ -45,7 +69,12 @@ declare class ShopifyToken {
    * @return {String} The authorization URL
    * @public
    */
-  generateAuthUrl(shop: string, scopes?: string | string[], nonce?: string, accessMode?: string): string;
+  generateAuthUrl(
+    shop: string,
+    scopes?: string | string[],
+    nonce?: string,
+    accessMode?: string
+  ): string;
   /**
    * Verify the hmac returned by Shopify.
    *
@@ -63,7 +92,12 @@ declare class ShopifyToken {
    *     additional data
    * @public
    */
-  getAccessToken(shop: string, code: string): Promise<Record<string, string>>;
+  getAccessToken(
+    shop: string,
+    code: string
+  ): Promise<
+    ShopifyToken.OfflineAccessTokenData | ShopifyToken.OnlineAccessTokenData
+  >;
 }
 
 export = ShopifyToken;
