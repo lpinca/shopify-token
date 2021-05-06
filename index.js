@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const https = require('https');
 const url = require('url');
+const timingSafeEqual = require('timing-safe-equal');
 
 /**
  * Encode a string by replacing each instance of the `&` and `%` characters
@@ -130,7 +131,7 @@ class ShopifyToken {
       .update(pairs.join('&'))
       .digest();
 
-    return crypto.timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
+    return timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
   }
 
   /**
