@@ -25,6 +25,26 @@ const encodeValue = (input) => input.replace(/[%&]/g, encodeURIComponent);
 const encodeKey = (input) => input.replace(/[%&=]/g, encodeURIComponent);
 
 /**
+ * Check whether two buffers have exactly the same bytes without leaking timing
+ * information.
+ *
+ * @param {Buffer} a One buffer to be tested for equality
+ * @param {Buffer} b The other buffer to be tested for equality
+ * @return {Boolean} `true` if `a` and `b` have exactly the same bytes, else
+ *     `false`
+ * @private
+ */
+function timingSafeEqual(a, b) {
+  let result = 0;
+
+  for (let i = 0; i < a.length; i++) {
+    result |= a[i] ^ b[i];
+  }
+
+  return result === 0;
+}
+
+/**
  * ShopifyToken class.
  */
 class ShopifyToken {
@@ -130,7 +150,7 @@ class ShopifyToken {
       .update(pairs.join('&'))
       .digest();
 
-    return crypto.timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
+    return timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
   }
 
   /**
