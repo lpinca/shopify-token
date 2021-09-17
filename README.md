@@ -179,8 +179,7 @@ shopifyToken
 
 [MIT](LICENSE)
 
-[api-access-mode]:
-  https://shopify.dev/concepts/about-apis/authentication#api-access-modes
+[api-access-mode]: https://shopify.dev/apps/auth/access-modes
 [npm-shopify-token-badge]: https://img.shields.io/npm/v/shopify-token.svg
 [npm-shopify-token]: https://www.npmjs.com/package/shopify-token
 [ci-shopify-token-badge]:
@@ -191,4 +190,4 @@ shopifyToken
   https://img.shields.io/coveralls/lpinca/shopify-token/master.svg
 [coverage-shopify-token]:
   https://coveralls.io/r/lpinca/shopify-token?branch=master
-[shopify-oauth-doc]: https://shopify.dev/tutorials/authenticate-with-oauth
+[shopify-oauth-doc]: https://shopify.dev/apps/auth/oauth
