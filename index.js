@@ -25,6 +25,26 @@ const encodeValue = (input) => input.replace(/[%&]/g, encodeURIComponent);
 const encodeKey = (input) => input.replace(/[%&=]/g, encodeURIComponent);
 
 /**
+ * Check whether two buffers have exactly the same bytes without leaking timing
+ * information.
+ *
+ * @param {Buffer} a One buffer to be tested for equality
+ * @param {Buffer} b The other buffer to be tested for equality
+ * @return {Boolean} `true` if `a` and `b` have exactly the same bytes, else
+ *     `false`
+ * @private
+ */
+function timingSafeEqual(a, b) {
+  let result = 0;
+
+  for (let i = 0; i < a.length; i++) {
+    result |= a[i] ^ b[i];
+  }
+
+  return result === 0;
+}
+
+/**
  * ShopifyToken class.
  */
 class ShopifyToken {
@@ -103,7 +123,7 @@ class ShopifyToken {
   /**
    * Verify the hmac returned by Shopify.
    *
-   * @param {Object} query The query string object
+   * @param {Object} query The parsed query string
    * @return {Boolean} `true` if the hmac is valid, else `false`
    * @public
    */
@@ -119,11 +139,18 @@ class ShopifyToken {
       })
       .sort();
 
+    if (
+      typeof query.hmac !== 'string' ||
+      Buffer.byteLength(query.hmac) !== 64
+    ) {
+      return false;
+    }
+
     const digest = crypto.createHmac('sha256', this.sharedSecret)
       .update(pairs.join('&'))
-      .digest('hex');
+      .digest();
 
-    return digest === query.hmac;
+    return timingSafeEqual(digest, Buffer.from(query.hmac, 'hex'));
   }
 
   /**

@@ -43,7 +43,7 @@ app.get('/callback', (req, res) => {
   if (
       typeof state !== 'string'
     || state !== req.session.state          // Validate the state.
-    || !shopifyToken.verifyHmac(req.query)  // Validare the hmac.
+    || !shopifyToken.verifyHmac(req.query)  // Validate the hmac.
   ) {
     return res.status(400).send('Security checks failed');
   }
