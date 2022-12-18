@@ -183,7 +183,7 @@ shopifyToken
 [npm-shopify-token-badge]: https://img.shields.io/npm/v/shopify-token.svg
 [npm-shopify-token]: https://www.npmjs.com/package/shopify-token
 [ci-shopify-token-badge]:
-  https://img.shields.io/github/workflow/status/lpinca/shopify-token/CI/master?label=CI
+  https://img.shields.io/github/actions/workflow/status/lpinca/shopify-token/ci.yml?branch=master&label=CI
 [ci-shopify-token]:
   https://github.com/lpinca/shopify-token/actions?query=workflow%3ACI+branch%3Amaster
 [coverage-shopify-token-badge]:
