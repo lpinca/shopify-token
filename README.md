@@ -45,6 +45,9 @@ Creates a new `ShopifyToken` instance.
   token that respects the user's permission level when making API requests
   (called online access). This is strongly recommended for embedded apps.
   Defaults to offline access mode.
+- `agent` - Optional - An HTTPS agent which will be passed to the HTTPS
+  request made for obtaining the auth token. This is useful when trying to
+  obtain a token from a server that has restrictions on internet access.
 
 #### Return value
 

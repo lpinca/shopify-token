@@ -58,6 +58,7 @@ class ShopifyToken {
    * @param {String} options.apiKey The API Key for the app
    * @param {String} [options.accessMode] The API access mode
    * @param {Number} [options.timeout] The request timeout
+   * @param {https.Agent} [options.agent] The agent for all HTTPS calls
    */
   constructor(options) {
     if (
@@ -75,6 +76,7 @@ class ShopifyToken {
     this.sharedSecret = options.sharedSecret;
     this.redirectUri = options.redirectUri;
     this.apiKey = options.apiKey;
+    this.agent = options.agent;
   }
 
   /**
@@ -178,7 +180,8 @@ class ShopifyToken {
         },
         path: '/admin/oauth/access_token',
         hostname: shop,
-        method: 'POST'
+        method: 'POST',
+        agent: this.agent
       });
 
       let timer = setTimeout(() => {
