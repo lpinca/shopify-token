@@ -15,7 +15,7 @@ declare namespace ShopifyToken {
     timeout?: number;
     // API access mode
     accessMode?: string;
-    // HTTPS proxy agent which will be passed to the HTTPS calls
+    // The agent used for all HTTP requests
     agent?: Agent;
   }
 
@@ -55,7 +55,7 @@ declare class ShopifyToken {
    * @param {String} options.apiKey The API Key for the app
    * @param {String} [options.accessMode] The API access mode
    * @param {Number} [options.timeout] The request timeout
-   * @param {Agent} [options.agent] The agent for all HTTPS calls
+   * @param {Agent} [options.agent] The agent used for all HTTP requests
    */
   constructor(options: ShopifyToken.ShopifyTokenOptions);
   /**

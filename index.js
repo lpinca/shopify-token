@@ -58,7 +58,7 @@ class ShopifyToken {
    * @param {String} options.apiKey The API Key for the app
    * @param {String} [options.accessMode] The API access mode
    * @param {Number} [options.timeout] The request timeout
-   * @param {https.Agent} [options.agent] The agent for all HTTPS calls
+   * @param {https.Agent} [options.agent] The agent used for all HTTP requests
    */
   constructor(options) {
     if (
