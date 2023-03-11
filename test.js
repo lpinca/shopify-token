@@ -2,6 +2,8 @@ describe('shopify-token', function () {
   'use strict';
 
   const expect = require('chai').expect;
+  const stream = require('stream');
+  const https = require('https');
   const nock = require('nock');
   const url = require('url');
 
@@ -230,7 +232,7 @@ describe('shopify-token', function () {
   describe('#getAccessToken', function () {
     const pathname = '/admin/oauth/access_token';
     const hostname = 'qux.myshopify.com';
-    const scope = nock(`https://${hostname}`);
+    const scope = nock(`https://${hostname}`, { allowUnmocked: true });
 
     afterEach(function () {
       expect(scope.isDone()).to.be.true;
@@ -249,6 +251,71 @@ describe('shopify-token', function () {
 
       return shopifyToken.getAccessToken(hostname, code)
         .then((data) => expect(data).to.deep.equal(reply));
+    });
+
+    it('honors the `agent` option', function () {
+      const code = '4d732838ad8c22cd1d2dd96f8a403fb7';
+      const requestBody = {
+        client_secret: 'foo',
+        client_id: 'baz',
+        code
+      };
+      const stringifiedRequestBody = JSON.stringify(requestBody);
+
+      const responseBody =  {
+        access_token: 'f85632530bf277ec9ac6f649fc327f17',
+        scope: 'read_content'
+      };
+      const stringifiedResponseBody = JSON.stringify(responseBody);
+
+      const agent = new https.Agent();
+
+      agent.createConnection = function () {
+        const duplex = new stream.Duplex({
+          read() {},
+          write(chunk, encoding, callback) {
+            if (chunk.length === 0) {
+              callback();
+              return;
+            }
+
+            expect(chunk.toString()).to.equal([
+              `POST ${pathname} HTTP/1.1`,
+              `Content-Length: ${Buffer.byteLength(stringifiedRequestBody)}`,
+              'Content-Type: application/json',
+              'Accept: application/json',
+              `Host: ${hostname}`,
+              'Connection: close',
+              '',
+              stringifiedRequestBody
+            ].join('\r\n'));
+
+            duplex.push([
+              'HTTP/1.1 200 OK',
+              'Content-Type: application/json',
+              `Content-Length: ${Buffer.byteLength(stringifiedResponseBody)}`,
+              'Connection: close',
+              `Date: ${new Date().toUTCString()}`,
+              '',
+              stringifiedResponseBody
+            ].join('\r\n'));
+
+            callback();
+          }
+        });
+
+        return duplex;
+      }
+
+      const shopifyToken = new ShopifyToken({
+        sharedSecret: 'foo',
+        redirectUri: 'bar',
+        apiKey: 'baz',
+        agent
+      });
+
+      return shopifyToken.getAccessToken(hostname, code)
+        .then((data) => expect(data).to.deep.equal(responseBody));
     });
 
     it('returns an error if the request fails', function () {
