@@ -116,7 +116,7 @@ class ShopifyToken {
 
     return url.format({
       pathname: '/admin/oauth/authorize',
-      hostname: shop.endsWith('.myshopify.com') ? shop : `${shop}.myshopify.com`,
+      hostname: shop.split(".").length > 1 ? shop : `${shop}.myshopify.com`,
       protocol: 'https:',
       query
     });
